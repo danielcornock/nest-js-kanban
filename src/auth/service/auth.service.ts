@@ -11,22 +11,19 @@ import { sign } from 'jsonwebtoken';
 import { jwtSecret, jwtExpires } from '../../config/env';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
 import { RepoService } from '../../shared/database/repo.factory';
+import { BaseService } from '../../shared/abstracts/service.abstract';
 
 @Injectable()
-export class AuthService {
-  private readonly _model: Model<IUser>;
-  private readonly _repo: RepoService<IUser>;
-
+export class AuthService extends BaseService<IUser> {
   constructor(@InjectModel('User') userModel: Model<IUser>) {
-    this._model = userModel;
-    this._repo = RepoService.create<IUser>(userModel);
+    super(userModel);
   }
 
   public async register(body: RegisterDTO): Promise<IUser> {
     try {
       body.password = await hash(body.password, 12);
-      const user: IUser = new this._model(body);
-      const savedUser: IUser = await this._repo.save(user);
+      const user: IUser = this._create(body);
+      const savedUser: IUser = await this._save(user);
 
       return savedUser;
     } catch {}
@@ -43,9 +40,7 @@ export class AuthService {
 
   private async _fetchUser(email: string): Promise<IUser> {
     try {
-      const user: IUser = await this._repo
-        .findOne({ email })
-        .select('+password');
+      const user: IUser = await this._findOne({ email }).select('+password');
 
       if (!user) {
         throw new NotFoundException('User with that email does not exist.');

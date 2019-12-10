@@ -5,6 +5,7 @@ import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
 import { UserModelMock } from '../model/user.model.mock';
 import { RepoService } from '../../shared/database/repo.factory';
+import { NotFoundException, NotAcceptableException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoService<IUser>;
@@ -86,30 +87,34 @@ describe('AuthService', () => {
       } as IUser;
 
       jest.spyOn(repo, 'findOne');
-      jest.spyOn(UserModelMock, 'findOne');
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
-
-      returnValue = await service.login(mockUserReq);
     });
 
-    it('should call the findone method in the repo service', () => {
-      expect(repo.findOne).toHaveBeenCalledWith({ email: mockUserReq.email });
-    });
-
-    test.todo('should call the select method to add the password');
-
-    it('should find the user', () => {
-      expect(UserModelMock.findOne).toHaveBeenCalledWith({
-        email: mockUserReq.email,
+    describe('when findOne resolves successfully', () => {
+      beforeEach(async () => {
+        jest.spyOn(UserModelMock, 'findOne');
+        returnValue = await service.login(mockUserReq);
       });
-    });
 
-    it('should check if the password is a match', () => {
-      expect(bcrypt.compare).toHaveBeenCalledWith('password', '####');
-    });
+      it('should call the findone method in the repo service', () => {
+        expect(repo.findOne).toHaveBeenCalledWith({ email: mockUserReq.email });
+      });
 
-    it('should return a user', () => {
-      expect(returnValue).toEqual(mockUserRes);
+      test.todo('should call the select method to add the password');
+
+      it('should find the user', () => {
+        expect(UserModelMock.findOne).toHaveBeenCalledWith({
+          email: mockUserReq.email,
+        });
+      });
+
+      it('should check if the password is a match', () => {
+        expect(bcrypt.compare).toHaveBeenCalledWith('password', '####');
+      });
+
+      it('should return a user', () => {
+        expect(returnValue).toEqual(mockUserRes);
+      });
     });
   });
 });
