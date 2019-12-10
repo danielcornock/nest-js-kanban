@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
-import { IUser } from '../user';
+import { getModelToken } from '@nestjs/mongoose';
+import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
-import { Model } from 'mongoose';
 import { UserModelMock } from '../model/user.model.mock';
+import { RepoService } from '../../shared/database/repo.factory';
 
 describe('AuthService', () => {
-  let service: AuthService;
+  let service: AuthService, repo: RepoService<IUser>;
 
   beforeEach(async () => {
     // function mockUserModel(dto: any) {
@@ -30,6 +30,9 @@ describe('AuthService', () => {
       ],
     }).compile();
 
+    repo = RepoService.create(UserModelMock);
+    jest.spyOn(RepoService, 'create').mockReturnValue(repo);
+
     service = module.get<AuthService>(AuthService);
   });
 
@@ -44,12 +47,17 @@ describe('AuthService', () => {
       } as IUser;
 
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('####' as never);
+      jest.spyOn(repo, 'save');
 
       returnValue = await service.register(mockUserReq);
     });
 
     it('should hash the password', () => {
       expect(bcrypt.hash).toHaveBeenCalledWith('password', 12);
+    });
+
+    it('should call the create method on the repo', () => {
+      expect(repo.save).toHaveBeenCalledWith({ data: mockUserReq });
     });
 
     it('should return a user with a hashed password', () => {
@@ -77,11 +85,18 @@ describe('AuthService', () => {
         password: '####',
       } as IUser;
 
+      jest.spyOn(repo, 'findOne');
       jest.spyOn(UserModelMock, 'findOne');
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
 
       returnValue = await service.login(mockUserReq);
     });
+
+    it('should call the findone method in the repo service', () => {
+      expect(repo.findOne).toHaveBeenCalledWith({ email: mockUserReq.email });
+    });
+
+    test.todo('should call the select method to add the password');
 
     it('should find the user', () => {
       expect(UserModelMock.findOne).toHaveBeenCalledWith({

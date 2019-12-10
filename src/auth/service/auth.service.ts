@@ -4,58 +4,68 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { IUser, RegisterDTO, LoginDTO } from '../user';
+import { IUser } from '../model/user';
 import { Model } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { jwtSecret, jwtExpires } from '../../config/env';
+import { RegisterDTO, LoginDTO } from '../data/auth.dto';
+import { RepoService } from '../../shared/database/repo.factory';
 
 @Injectable()
 export class AuthService {
   private readonly _model: Model<IUser>;
+  private readonly _repo: RepoService<IUser>;
 
   constructor(@InjectModel('User') userModel: Model<IUser>) {
     this._model = userModel;
+    this._repo = RepoService.create<IUser>(userModel);
   }
 
   public async register(body: RegisterDTO): Promise<IUser> {
-    body.password = await hash(body.password, 12);
-    const user: IUser = new this._model(body);
-    const savedUser: IUser = await user.save();
+    try {
+      body.password = await hash(body.password, 12);
+      const user: IUser = new this._model(body);
+      const savedUser: IUser = await this._repo.save(user);
 
-    return savedUser;
+      return savedUser;
+    } catch {}
   }
 
   public async login(body: LoginDTO): Promise<IUser> {
-    const user: IUser = await this._fetchUser(body.email);
-    await this._checkPasswordMatch(body.password, user.password);
+    try {
+      const user: IUser = await this._fetchUser(body.email);
+      await this._checkPasswordMatch(body.password, user.password);
 
-    return user;
+      return user;
+    } catch {}
   }
 
   private async _fetchUser(email: string): Promise<IUser> {
-    const user: IUser = await this._model
-      .findOne({ email })
-      .select('+password');
+    try {
+      const user: IUser = await this._repo
+        .findOne({ email })
+        .select('+password');
 
-    if (!user) {
-      throw new NotFoundException('User with that email does not exist.');
-    }
+      if (!user) {
+        throw new NotFoundException('User with that email does not exist.');
+      }
 
-    return user;
+      return user;
+    } catch {}
   }
 
   private async _checkPasswordMatch(
     loginPassword,
     storedPassword,
   ): Promise<void> {
-    const match: boolean = await compare(loginPassword, storedPassword);
-
-    if (!match) {
-      throw new UnauthorizedException(
-        'The password you have provided is incorrect.',
-      );
-    }
+    try {
+      if (!(await compare(loginPassword, storedPassword))) {
+        throw new UnauthorizedException(
+          'The password you have provided is incorrect.',
+        );
+      }
+    } catch {}
   }
 
   public createJwt(name: string, id: string) {

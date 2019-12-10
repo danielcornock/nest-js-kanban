@@ -1,4 +1,5 @@
-import { RegisterDTO, IUser } from '../user';
+import { IUser } from '../model/user';
+import { RegisterDTO } from '../data/auth.dto';
 
 export class AuthServiceMock {
   public async register(body: RegisterDTO): Promise<IUser> {

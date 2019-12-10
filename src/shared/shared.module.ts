@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ResponseInterceptor } from './interceptors/response/response.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { RepoService } from './database/repo.factory';
 
 @Global()
 @Module({
@@ -10,6 +11,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       useClass: ResponseInterceptor,
     },
   ],
-  exports: [],
+  exports: [RepoService],
 })
 export class SharedModule {}
