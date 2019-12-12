@@ -1,4 +1,5 @@
 import { IParams } from '../../config/interfaces/params.interface';
+import { Model } from 'mongoose';
 
 export class RepoService<M> {
   private readonly _model;
@@ -7,7 +8,7 @@ export class RepoService<M> {
     this._model = model;
   }
 
-  public static create<M>(model: any) {
+  public static create<M>(model: any): RepoService<M> {
     return new RepoService<M>(model);
   }
 

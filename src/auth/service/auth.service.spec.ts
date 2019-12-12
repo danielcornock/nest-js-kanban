@@ -11,16 +11,6 @@ describe('AuthService', () => {
   let service: AuthService, repo: RepoService<IUser>;
 
   beforeEach(async () => {
-    // function mockUserModel(dto: any) {
-    //   this.data = dto;
-    //   this.save = () => {
-    //     return this.data;
-    //   };
-    //   this.findOne = () => {
-    //     return this.data;
-    //   };
-    // }
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -90,17 +80,60 @@ describe('AuthService', () => {
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
     });
 
-    describe('when findOne resolves successfully', () => {
+    describe('when findOne rejects', () => {
+      let rejectedFunction;
       beforeEach(async () => {
-        jest.spyOn(UserModelMock, 'findOne');
+        rejectedFunction = jest
+          .spyOn(UserModelMock, 'findOne')
+          .mockRejectedValue('rejected' as never);
+
         returnValue = await service.login(mockUserReq);
+      });
+
+      it('should throw an error', () => {
+        expect(rejectedFunction).toThrowError();
+      });
+
+      it('should not check if the password is a match', () => {
+        expect(bcrypt.compare).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when findOne resolves but does not find a user', () => {
+      beforeEach(async () => {
+        jest.spyOn(UserModelMock, 'findOne').mockReturnValue(undefined);
+        returnValue = await service.login(mockUserReq);
+      });
+
+      it('should throw a not found exception', () => {
+        expect(NotFoundException).toThrowError();
+      });
+
+      it('should not check for a password match', () => {
+        expect(bcrypt.compare).not.toHaveBeenCalled();
+      });
+
+      it('should not return a user', () => {
+        expect(returnValue).toBe(undefined);
+      });
+    });
+
+    describe('when findOne resolves successfully', () => {
+      let userReturn: UserModelMock;
+      beforeEach(async () => {
+        userReturn = new UserModelMock();
+        jest.spyOn(userReturn, 'select');
+        jest.spyOn(UserModelMock, 'findOne').mockReturnValue(userReturn);
+        returnValue = await service.login(mockUserReq);
+      });
+
+      it('should call select on the returned value', () => {
+        expect(userReturn.select).toHaveBeenCalled();
       });
 
       it('should call the findone method in the repo service', () => {
         expect(repo.findOne).toHaveBeenCalledWith({ email: mockUserReq.email });
       });
-
-      test.todo('should call the select method to add the password');
 
       it('should find the user', () => {
         expect(UserModelMock.findOne).toHaveBeenCalledWith({

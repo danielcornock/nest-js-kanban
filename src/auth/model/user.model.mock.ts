@@ -4,7 +4,7 @@ export class UserModelMock {
   constructor(public data?: any) {}
   public user;
 
-  save() {
+  public save(data?: any) {
     const model = new UserModelMock();
     model.data = {
       email: 'tester@mail.com',
@@ -14,7 +14,7 @@ export class UserModelMock {
     return model.data;
   }
 
-  select() {
+  public select(data: any) {
     return new Promise((resolve, reject) => {
       resolve({
         email: 'tester@mail.com',
@@ -25,7 +25,11 @@ export class UserModelMock {
     });
   }
 
-  static findOne(any) {
+  public findOne(arg1, arg2) {
+    return 'test';
+  }
+
+  public static findOne(any) {
     const model = new UserModelMock();
     model.data = {
       email: 'tester@mail.com',

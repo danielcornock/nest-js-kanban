@@ -11,6 +11,6 @@ import { RepoService } from './database/repo.factory';
       useClass: ResponseInterceptor,
     },
   ],
-  exports: [RepoService],
+  exports: [],
 })
 export class SharedModule {}

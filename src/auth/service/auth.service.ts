@@ -8,9 +8,8 @@ import { IUser } from '../model/user';
 import { Model } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
-import { jwtSecret, jwtExpires } from '../../config/env';
+import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
-import { RepoService } from '../../shared/database/repo.factory';
 import { BaseService } from '../../shared/abstracts/service.abstract';
 
 @Injectable()
