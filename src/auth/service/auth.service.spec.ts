@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserModelMock } from '../model/user.model.mock';
 import { RepoFactory } from '../../shared/database/repo.factory';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
+import { Model } from 'mongoose';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoFactory<IUser>;
@@ -77,27 +78,16 @@ describe('AuthService', () => {
   });
 
   describe('when a user is logging in', () => {
-    let mockUserRes: IUser,
-      mockUserReq: IUser,
-      returnValue: IUser,
-      findOneSpy,
-      bcryptCompareSpy;
+    let mockUserReq: IUser, returnValue: IUser, findOneSpy, bcryptCompareSpy;
 
     beforeEach(async () => {
+      findOneSpy = jest.spyOn(repo, 'findOne');
+      bcryptCompareSpy = jest.spyOn(bcrypt, 'compare');
+
       mockUserReq = {
         email: 'tester@mail.com',
         password: 'password',
       } as IUser;
-
-      mockUserRes = {
-        name: 'Tester',
-        email: 'tester@mail.com',
-        _id: '0000',
-        password: '####',
-      } as IUser;
-
-      findOneSpy = jest.spyOn(repo, 'findOne');
-      bcryptCompareSpy = jest.spyOn(bcrypt, 'compare');
     });
 
     afterEach(() => {
@@ -106,6 +96,7 @@ describe('AuthService', () => {
 
     describe('when a matching user is found', () => {
       let foundUser: UserModelMock;
+
       beforeEach(async () => {
         foundUser = new UserModelMock();
         findOneSpy.mockReturnValue(foundUser);
