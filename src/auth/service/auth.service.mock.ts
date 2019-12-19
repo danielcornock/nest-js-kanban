@@ -13,4 +13,8 @@ export class AuthServiceMock {
   public async login(): Promise<IUser> {
     return {} as IUser;
   }
+
+  public async fetchUser(): Promise<IUser> {
+    return {} as IUser;
+  }
 }

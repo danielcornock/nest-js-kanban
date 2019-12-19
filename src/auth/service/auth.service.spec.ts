@@ -3,12 +3,13 @@ import { AuthService } from './auth.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
 import { UserModelMock } from '../model/user.model.mock';
-import { RepoService } from '../../shared/database/repo.factory';
-import { NotFoundException, NotAcceptableException } from '@nestjs/common';
+import { RepoFactory } from '../../shared/database/repo.factory';
+import { jwtSecret, jwtExpires } from '../../config/env/env';
 
 describe('AuthService', () => {
-  let service: AuthService, repo: RepoService<IUser>;
+  let service: AuthService, repo: RepoFactory<IUser>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,47 +22,66 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    repo = RepoService.create(UserModelMock);
-    jest.spyOn(RepoService, 'create').mockReturnValue(repo);
+    repo = RepoFactory.create(UserModelMock);
+    jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
     service = module.get<AuthService>(AuthService);
   });
 
   describe('when a user is registering', () => {
-    let mockUserReq: IUser, returnValue: IUser;
+    let mockUserReq: IUser, returnValue: IUser, hashSpy, saveSpy;
 
     beforeEach(async () => {
+      hashSpy = jest.spyOn(bcrypt, 'hash');
+      saveSpy = jest.spyOn(repo, 'save');
+
       mockUserReq = {
         name: 'Tester',
         email: 'tester@mail.com',
         password: 'password',
       } as IUser;
-
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue('####' as never);
-      jest.spyOn(repo, 'save');
-
-      returnValue = await service.register(mockUserReq);
     });
 
-    it('should hash the password', () => {
-      expect(bcrypt.hash).toHaveBeenCalledWith('password', 12);
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
-    it('should call the create method on the repo', () => {
-      expect(repo.save).toHaveBeenCalledWith({ data: mockUserReq });
-    });
+    describe('when the hash is successfully created', () => {
+      beforeEach(() => {
+        hashSpy.mockResolvedValue('####' as never);
+      });
 
-    it('should return a user with a hashed password', () => {
-      expect(returnValue).toEqual({
-        email: 'tester@mail.com',
-        name: 'Tester',
-        password: '####',
+      describe('when the user has been saved', () => {
+        beforeEach(async () => {
+          saveSpy.mockReturnValue('savedUser');
+          returnValue = await service.register(mockUserReq);
+        });
+
+        it('should hash the password', () => {
+          expect(bcrypt.hash).toHaveBeenCalledWith('password', 12);
+        });
+
+        it('should save the user to the database', () => {
+          expect(repo.save).toHaveBeenCalledWith({ data: mockUserReq });
+        });
+
+        it('should return the created usser', () => {
+          expect(returnValue).toBe('savedUser');
+        });
+
+        describe('when the user has been saved', () => {
+          beforeEach(async () => {});
+        });
       });
     });
   });
 
   describe('when a user is logging in', () => {
-    let mockUserRes: IUser, mockUserReq: IUser, returnValue: IUser;
+    let mockUserRes: IUser,
+      mockUserReq: IUser,
+      returnValue: IUser,
+      findOneSpy,
+      bcryptCompareSpy;
 
     beforeEach(async () => {
       mockUserReq = {
@@ -76,78 +96,89 @@ describe('AuthService', () => {
         password: '####',
       } as IUser;
 
-      jest.spyOn(repo, 'findOne');
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      findOneSpy = jest.spyOn(repo, 'findOne');
+      bcryptCompareSpy = jest.spyOn(bcrypt, 'compare');
     });
 
-    describe('when findOne rejects', () => {
-      let rejectedFunction;
-      beforeEach(async () => {
-        rejectedFunction = jest
-          .spyOn(UserModelMock, 'findOne')
-          .mockRejectedValue('rejected' as never);
-
-        returnValue = await service.login(mockUserReq);
-      });
-
-      it('should throw an error', () => {
-        expect(rejectedFunction).toThrowError();
-      });
-
-      it('should not check if the password is a match', () => {
-        expect(bcrypt.compare).not.toHaveBeenCalled();
-      });
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
-    describe('when findOne resolves but does not find a user', () => {
+    describe('when a matching user is found', () => {
+      let foundUser: UserModelMock;
       beforeEach(async () => {
-        jest.spyOn(UserModelMock, 'findOne').mockReturnValue(undefined);
-        returnValue = await service.login(mockUserReq);
+        foundUser = new UserModelMock();
+        findOneSpy.mockReturnValue(foundUser);
+        jest
+          .spyOn(foundUser, 'select')
+          .mockReturnValue({ password: '####' } as IUser);
       });
 
-      it('should throw a not found exception', () => {
-        expect(NotFoundException).toThrowError();
-      });
+      describe('when the password is a match', () => {
+        beforeEach(async () => {
+          bcryptCompareSpy.mockResolvedValue(true as never);
+          returnValue = await service.login(mockUserReq);
+        });
 
-      it('should not check for a password match', () => {
-        expect(bcrypt.compare).not.toHaveBeenCalled();
-      });
+        it('should search for a matching user', () => {
+          expect(repo.findOne).toHaveBeenCalledWith({
+            email: mockUserReq.email,
+          });
+        });
 
-      it('should not return a user', () => {
-        expect(returnValue).toBe(undefined);
-      });
-    });
+        it('should request the password from the database', () => {
+          expect(foundUser.select).toHaveBeenCalledWith('+password');
+        });
 
-    describe('when findOne resolves successfully', () => {
-      let userReturn: UserModelMock;
-      beforeEach(async () => {
-        userReturn = new UserModelMock();
-        jest.spyOn(userReturn, 'select');
-        jest.spyOn(UserModelMock, 'findOne').mockReturnValue(userReturn);
-        returnValue = await service.login(mockUserReq);
-      });
+        it('should check if the password is a match', () => {
+          expect(bcrypt.compare).toHaveBeenCalledWith('password', '####');
+        });
 
-      it('should call select on the returned value', () => {
-        expect(userReturn.select).toHaveBeenCalled();
-      });
-
-      it('should call the findone method in the repo service', () => {
-        expect(repo.findOne).toHaveBeenCalledWith({ email: mockUserReq.email });
-      });
-
-      it('should find the user', () => {
-        expect(UserModelMock.findOne).toHaveBeenCalledWith({
-          email: mockUserReq.email,
+        it('should return a user', () => {
+          expect(returnValue).toEqual({ password: '####' });
         });
       });
+    });
+  });
 
-      it('should check if the password is a match', () => {
-        expect(bcrypt.compare).toHaveBeenCalledWith('password', '####');
-      });
+  describe('when creating a json web token', () => {
+    let returnValue: string;
 
-      it('should return a user', () => {
-        expect(returnValue).toEqual(mockUserRes);
-      });
+    beforeEach(() => {
+      jest
+        .spyOn(jwt, 'sign')
+        .mockReturnValue(('jsonwebtoken' as unknown) as void);
+
+      returnValue = service.createJwt('testName', '001');
+    });
+
+    it('should sign the token', () => {
+      expect(jwt.sign).toHaveBeenCalledWith(
+        { id: '001', name: 'testName' },
+        jwtSecret,
+        { expiresIn: jwtExpires },
+      );
+    });
+
+    it('should return the signed token', () => {
+      expect(returnValue).toBe('jsonwebtoken');
+    });
+  });
+
+  describe('when fetching a user', () => {
+    let returnValue: IUser;
+
+    beforeEach(async () => {
+      jest.spyOn(repo, 'findOne').mockReturnValue({ name: 'test' });
+      returnValue = await service.fetchUser({ id: '000' });
+    });
+
+    it('should fetch the user from the repo', () => {
+      expect(repo.findOne).toHaveBeenCalledWith({ id: '000' });
+    });
+
+    it('should return the user', () => {
+      expect(returnValue).toEqual({ name: 'test' });
     });
   });
 });

@@ -11,6 +11,7 @@ import { sign } from 'jsonwebtoken';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
 import { BaseService } from '../../shared/abstracts/service.abstract';
+import { IParams } from 'src/config/interfaces/params.interface';
 
 @Injectable()
 export class AuthService extends BaseService<IUser> {
@@ -25,7 +26,9 @@ export class AuthService extends BaseService<IUser> {
       const savedUser: IUser = await this._save(user);
 
       return savedUser;
-    } catch {}
+    } catch (e) {
+      throw e;
+    }
   }
 
   public async login(body: LoginDTO): Promise<IUser> {
@@ -34,19 +37,26 @@ export class AuthService extends BaseService<IUser> {
       await this._checkPasswordMatch(body.password, user.password);
 
       return user;
-    } catch {}
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async fetchUser(query: IParams): Promise<IUser> {
+    return await this._findOne(query);
   }
 
   private async _fetchUser(email: string): Promise<IUser> {
     try {
       const user: IUser = await this._findOne({ email }).select('+password');
 
-      if (!user) {
-        throw new NotFoundException('User with that email does not exist.');
-      }
+      if (!user)
+        throw new NotFoundException('No user found with that email address.');
 
       return user;
-    } catch {}
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _checkPasswordMatch(
@@ -54,15 +64,17 @@ export class AuthService extends BaseService<IUser> {
     storedPassword,
   ): Promise<void> {
     try {
-      if (!(await compare(loginPassword, storedPassword))) {
-        throw new UnauthorizedException(
-          'The password you have provided is incorrect.',
-        );
+      const isMatch: boolean = await compare(loginPassword, storedPassword);
+
+      if (!isMatch) {
+        throw new UnauthorizedException("Oops! That's the wrong password");
       }
-    } catch {}
+    } catch (e) {
+      throw e;
+    }
   }
 
-  public createJwt(name: string, id: string) {
+  public createJwt(name: string, id: string): string {
     return sign({ id, name }, jwtSecret, { expiresIn: jwtExpires });
   }
 }
