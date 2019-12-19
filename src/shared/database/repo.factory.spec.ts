@@ -1,15 +1,14 @@
-import { RepoService } from './repo.factory';
-import { getModelToken } from '@nestjs/mongoose';
-import { UserModelMock } from '../../auth/model/user.model.mock';
+import { RepoFactory } from './repo.factory';
+import { MongooseModelMock } from '../../testing/mongoose-model.mock';
 import { IUser } from 'src/auth/model/user';
 import { Model } from 'mongoose';
 
 describe('RepoFactory', () => {
-  let factory: RepoService<IUser>, model: Model<IUser>, result: string;
+  let factory: RepoFactory<IUser>, model: Model<IUser>, result: string;
 
   beforeEach(() => {
-    model = (new UserModelMock() as unknown) as Model<IUser>;
-    factory = new RepoService(model);
+    model = (new MongooseModelMock() as unknown) as Model<IUser>;
+    factory = new RepoFactory(model);
   });
 
   describe('when finding one item from the database', () => {
@@ -28,10 +27,10 @@ describe('RepoFactory', () => {
   });
 
   describe('when saving an item to the database', () => {
-    let modelToSave: UserModelMock, result: string;
+    let modelToSave: MongooseModelMock, result: string;
 
     beforeEach(() => {
-      modelToSave = new UserModelMock();
+      modelToSave = new MongooseModelMock();
       jest.spyOn(modelToSave, 'save').mockReturnValue('saved');
       result = factory.save(modelToSave);
     });

@@ -1,17 +1,17 @@
 import { Document, Model } from 'mongoose';
-import { RepoService } from '../database/repo.factory';
+import { RepoFactory } from '../database/repo.factory';
 import { IParams } from 'src/config/interfaces/params.interface';
 
 export class BaseService<D extends Document> {
   protected readonly _model: Model<D>;
-  protected readonly _repo: RepoService<D>;
+  protected readonly _repo: RepoFactory<D>;
 
-  constructor(model: Model<D>) {
-    this._model = model;
-    this._repo = RepoService.create<D>(model);
+  constructor(mongooseModel: Model<D>) {
+    this._model = mongooseModel;
+    this._repo = RepoFactory.create<D>(mongooseModel);
   }
 
-  protected _create(body: IParams) {
+  protected _create(body: Partial<D>) {
     return new this._model(body);
   }
 
