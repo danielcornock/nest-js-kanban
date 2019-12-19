@@ -3,11 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from '../service/auth.service';
 import { AuthServiceMock } from '../service/auth.service.mock';
 import { IUser } from '../model/user';
-
-interface IAuthRes {
-  jwt: string;
-  user: IUser;
-}
+import { IAuthRes } from '../data/auth-res.interface';
 
 describe('Auth Controller', () => {
   let controller: AuthController, service: AuthService, mockUserRes: IUser;
@@ -62,21 +58,6 @@ describe('Auth Controller', () => {
         expect(returnValue).toEqual({ jwt: 'jwttoken', user: mockUserRes });
       });
     });
-
-    describe('when the register method rejects', () => {
-      beforeEach(async () => {
-        jest.spyOn(service, 'register').mockRejectedValue('fail');
-        returnValue = await controller.register(mockUserReq);
-      });
-
-      it('should not fetch the JWT token', () => {
-        expect(service.createJwt).not.toHaveBeenCalled();
-      });
-
-      it('should not attempt to return the user', () => {
-        expect(returnValue).toBe(undefined);
-      });
-    });
   });
 
   describe('when attempting to log in', () => {
@@ -105,21 +86,6 @@ describe('Auth Controller', () => {
 
       it('should return the jwt and user object', () => {
         expect(returnValue).toEqual({ jwt: 'jwttoken', user: mockUserRes });
-      });
-    });
-
-    describe('when the log in method rejects', () => {
-      beforeEach(async () => {
-        jest.spyOn(service, 'login').mockRejectedValue('fail');
-        returnValue = await controller.login(mockUserReq);
-      });
-
-      it('should not fetch the JWT token', () => {
-        expect(service.createJwt).not.toHaveBeenCalled();
-      });
-
-      it('should not attempt to return the user', () => {
-        expect(returnValue).toBe(undefined);
       });
     });
   });

@@ -4,10 +4,9 @@ import { getModelToken } from '@nestjs/mongoose';
 import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { UserModelMock } from '../model/user.model.mock';
+import { MongooseModelMock } from '../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../shared/database/repo.factory';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
-import { Model } from 'mongoose';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoFactory<IUser>;
@@ -18,12 +17,12 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: getModelToken('User'),
-          useValue: UserModelMock,
+          useValue: MongooseModelMock,
         },
       ],
     }).compile();
 
-    repo = RepoFactory.create(UserModelMock);
+    repo = RepoFactory.create(MongooseModelMock);
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
     service = module.get<AuthService>(AuthService);
@@ -95,10 +94,10 @@ describe('AuthService', () => {
     });
 
     describe('when a matching user is found', () => {
-      let foundUser: UserModelMock;
+      let foundUser: MongooseModelMock;
 
       beforeEach(async () => {
-        foundUser = new UserModelMock();
+        foundUser = new MongooseModelMock();
         findOneSpy.mockReturnValue(foundUser);
         jest
           .spyOn(foundUser, 'select')

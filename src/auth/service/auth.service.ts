@@ -20,26 +20,18 @@ export class AuthService extends BaseService<IUser> {
   }
 
   public async register(body: RegisterDTO): Promise<IUser> {
-    try {
-      body.password = await hash(body.password, 12);
-      const user: IUser = this._create(body);
-      const savedUser: IUser = await this._save(user);
+    body.password = await hash(body.password, 12);
+    const user: IUser = this._create(body);
+    const savedUser: IUser = await this._save(user);
 
-      return savedUser;
-    } catch (e) {
-      throw e;
-    }
+    return savedUser;
   }
 
   public async login(body: LoginDTO): Promise<IUser> {
-    try {
-      const user: IUser = await this._fetchUser(body.email);
-      await this._checkPasswordMatch(body.password, user.password);
+    const user: IUser = await this._fetchUser(body.email);
+    await this._checkPasswordMatch(body.password, user.password);
 
-      return user;
-    } catch (e) {
-      throw e;
-    }
+    return user;
   }
 
   public async fetchUser(query: IParams): Promise<IUser> {
@@ -47,30 +39,22 @@ export class AuthService extends BaseService<IUser> {
   }
 
   private async _fetchUser(email: string): Promise<IUser> {
-    try {
-      const user: IUser = await this._findOne({ email }).select('+password');
+    const user: IUser = await this._findOne({ email }).select('+password');
 
-      if (!user)
-        throw new NotFoundException('No user found with that email address.');
+    if (!user)
+      throw new NotFoundException('No user found with that email address.');
 
-      return user;
-    } catch (e) {
-      throw e;
-    }
+    return user;
   }
 
   private async _checkPasswordMatch(
     loginPassword,
     storedPassword,
   ): Promise<void> {
-    try {
-      const isMatch: boolean = await compare(loginPassword, storedPassword);
+    const isMatch: boolean = await compare(loginPassword, storedPassword);
 
-      if (!isMatch) {
-        throw new UnauthorizedException("Oops! That's the wrong password");
-      }
-    } catch (e) {
-      throw e;
+    if (!isMatch) {
+      throw new UnauthorizedException("Oops! That's the wrong password");
     }
   }
 
