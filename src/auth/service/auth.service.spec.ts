@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { MongooseModelMock } from '../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../shared/database/repo.factory';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
+import { Model } from 'mongoose';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoFactory<IUser>;
@@ -22,7 +23,9 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    repo = RepoFactory.create(MongooseModelMock);
+    repo = RepoFactory.create<IUser>(
+      (MongooseModelMock as Partial<Model<IUser>>) as Model<IUser>,
+    );
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
     service = module.get<AuthService>(AuthService);
@@ -67,10 +70,6 @@ describe('AuthService', () => {
 
         it('should return the created usser', () => {
           expect(returnValue).toBe('savedUser');
-        });
-
-        describe('when the user has been saved', () => {
-          beforeEach(async () => {});
         });
       });
     });
@@ -159,7 +158,7 @@ describe('AuthService', () => {
     let returnValue: IUser;
 
     beforeEach(async () => {
-      jest.spyOn(repo, 'findOne').mockReturnValue({ name: 'test' });
+      jest.spyOn(repo, 'findOne').mockResolvedValue({ name: 'test' } as IUser);
       returnValue = await service.fetchUser({ id: '000' });
     });
 

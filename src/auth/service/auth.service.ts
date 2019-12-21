@@ -10,7 +10,7 @@ import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
-import { BaseService } from '../../shared/abstracts/service.abstract';
+import { BaseService } from '../../shared/abstracts/base-service.abstract';
 import { IParams } from 'src/config/interfaces/params.interface';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class AuthService extends BaseService<IUser> {
 
   public async register(body: RegisterDTO): Promise<IUser> {
     body.password = await hash(body.password, 12);
-    const user: IUser = this._create(body);
+    const user: IUser = this._create<RegisterDTO>(body);
     const savedUser: IUser = await this._save(user);
 
     return savedUser;
