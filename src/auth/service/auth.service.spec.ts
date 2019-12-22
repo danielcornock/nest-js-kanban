@@ -5,9 +5,10 @@ import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { MongooseModelMock } from '../../testing/mongoose-model.mock';
-import { RepoFactory } from '../../shared/database/repo.factory';
+import { RepoFactory } from '../../shared/database/factory/repo.factory';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { Model } from 'mongoose';
+import { MongooseModel } from 'src/shared/database/mongoose/constants';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoFactory<IUser>;
@@ -17,7 +18,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: getModelToken('User'),
+          provide: MongooseModel.USER,
           useValue: MongooseModelMock,
         },
       ],

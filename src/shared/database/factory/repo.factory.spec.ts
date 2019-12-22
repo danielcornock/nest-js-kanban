@@ -1,5 +1,5 @@
 import { RepoFactory } from './repo.factory';
-import { MongooseModelMock } from '../../testing/mongoose-model.mock';
+import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
 import { IUser } from 'src/auth/model/user';
 import { Model } from 'mongoose';
 
@@ -14,7 +14,7 @@ describe('RepoFactory', () => {
   describe('when finding one item from the database', () => {
     beforeEach(() => {
       jest.spyOn(model, 'findOne').mockReturnValue('data' as never);
-      result = factory.findOne({ _id: '0000' });
+      result = (factory.findOne({ _id: '0000' }) as unknown) as string;
     });
 
     it('should call the findone function on the model', () => {
@@ -32,7 +32,9 @@ describe('RepoFactory', () => {
     beforeEach(() => {
       modelToSave = new MongooseModelMock();
       jest.spyOn(modelToSave, 'save').mockReturnValue('saved');
-      result = factory.save(modelToSave);
+      result = (factory.save(
+        (modelToSave as Partial<IUser>) as IUser,
+      ) as unknown) as string;
     });
 
     it('should call the save function on the model', () => {

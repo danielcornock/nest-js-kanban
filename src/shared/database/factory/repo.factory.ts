@@ -1,4 +1,4 @@
-import { IParams } from '../../config/interfaces/params.interface';
+import { IParams } from '../../../config/interfaces/params.interface';
 import { Model, Document, DocumentQuery, Query } from 'mongoose';
 
 export class RepoFactory<D extends Document> {

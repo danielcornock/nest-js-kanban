@@ -1,5 +1,5 @@
 import { Document, Model, DocumentQuery } from 'mongoose';
-import { RepoFactory, IDeleteQuery } from '../database/repo.factory';
+import { RepoFactory, IDeleteQuery } from '../database/factory/repo.factory';
 import { IParams } from 'src/config/interfaces/params.interface';
 
 export abstract class BaseService<IDoc extends Document> {
@@ -29,8 +29,11 @@ export abstract class BaseService<IDoc extends Document> {
     return this._repo.findOne(this._attachUserToParams(query, userId));
   }
 
-  protected _findMany(user: string): DocumentQuery<IDoc[], IDoc, {}> {
-    return this._repo.findMany({ user });
+  protected _findMany(
+    userId: string,
+    params?: IParams,
+  ): DocumentQuery<IDoc[], IDoc, {}> {
+    return this._repo.findMany(this._attachUserToParams(params, userId));
   }
 
   protected _delete(query: IParams, userId: string): IDeleteQuery {

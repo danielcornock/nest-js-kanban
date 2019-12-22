@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from '../model/user';
@@ -12,10 +13,11 @@ import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
 import { BaseService } from '../../shared/abstracts/base-service.abstract';
 import { IParams } from 'src/config/interfaces/params.interface';
+import { MongooseModel } from 'src/shared/database/mongoose/constants';
 
 @Injectable()
 export class AuthService extends BaseService<IUser> {
-  constructor(@InjectModel('User') userModel: Model<IUser>) {
+  constructor(@Inject(MongooseModel.USER) userModel: Model<IUser>) {
     super(userModel);
   }
 

@@ -11,7 +11,7 @@ import { verify } from 'jsonwebtoken';
 import { jwtSecret } from '../../config/env/env';
 import { IParams } from 'src/config/interfaces/params.interface';
 import { AuthService } from '../service/auth.service';
-import { promisify } from '../../shared/utilties/utilities';
+import { promisify } from '../../config/utilties/utilities';
 import { IUser } from '../model/user';
 
 @Injectable()

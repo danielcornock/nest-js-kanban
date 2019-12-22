@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { jwtSecret } from '../../config/env/env';
-import * as util from '../../shared/utilties/utilities';
-import * as promFn from '../../shared/utilties/promisifiedFn';
-import { promisifySpy } from '../../shared/utilties/utilities.test';
+import * as util from '../../config/utilties/utilities';
+import * as promFn from '../../config/utilties/promisifiedFn';
+import { promisifySpy } from '../../config/utilties/utilities.test';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard,

@@ -1,7 +1,7 @@
 import { CrudService } from './crud-service.abstract';
 import { Document, Model } from 'mongoose';
 import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
-import { RepoFactory } from '../../../shared/database/repo.factory';
+import { RepoFactory } from '../../database/factory/repo.factory';
 import { IUser } from 'src/auth/model/user';
 
 const model = new MongooseModelMock();
