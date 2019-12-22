@@ -35,19 +35,22 @@ export abstract class CrudService<IDoc extends Document> extends BaseService<
     params: IParams,
   ): Promise<IDoc> {
     const document = await this._findOne(params, userId);
-    if (!document)
+    console.log(document);
+    if (!document) {
       throw new NotFoundException(
         'The item you are trying to edit cannot be found!',
       );
+    }
     Object.assign(document, body);
     return await this._save(document);
   }
 
   public async delete(docId: string, userId: string): Promise<void> {
     const result = await this._delete({ _id: docId }, userId);
-    if (!result.deletedCount)
+    if (!result.deletedCount) {
       throw new NotFoundException(
         'The item you are trying to delete cannot be found!',
       );
+    }
   }
 }

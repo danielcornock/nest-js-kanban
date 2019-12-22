@@ -3,7 +3,7 @@ import { Document, Model } from 'mongoose';
 import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../database/factory/repo.factory';
 import { IUser } from 'src/auth/model/user';
-import { NotFoundException } from '@nestjs/common';
+import * as exceptions from '@nestjs/common';
 import { RepoFactoryStub } from '../../../shared/database/factory/repo.factory.stub';
 
 const model = new MongooseModelMock();
@@ -18,11 +18,16 @@ describe('CrudService', () => {
     model = (new MongooseModelMock() as Partial<Model<Document>>) as Model<
       Document
     >;
+
     repo = (new RepoFactoryStub() as Partial<
       RepoFactory<Document>
     >) as RepoFactory<Document>;
+
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
+
     service = new TestCrudService(model);
+
+    jest.spyOn(exceptions, 'NotFoundException' as any);
   });
 
   describe('when fetching one document from the database', () => {
@@ -55,8 +60,8 @@ describe('CrudService', () => {
         });
       });
 
-      it('should throw an error', () => {
-        expect(result).toBeInstanceOf(NotFoundException);
+      it('should throw a not found exception', () => {
+        expect(exceptions.NotFoundException).toHaveBeenCalled();
       });
     });
   });
@@ -77,53 +82,89 @@ describe('CrudService', () => {
   });
 
   describe('when updating a document in the database', () => {
-    beforeEach(async () => {
-      (repo.findOne as jest.Mock).mockResolvedValue({
-        name: 'oldDocName',
-      });
-      (repo.save as jest.Mock).mockResolvedValue({
-        name: 'newDocName',
-        user: 'userId',
+    describe('when a document is not found', () => {
+      beforeEach(async () => {
+        jest.clearAllMocks();
+        (repo.findOne as jest.Mock).mockResolvedValue(undefined);
+        service
+          .update(({ name: 'newDocName' } as unknown) as Document, 'userId', {
+            _id: 'docId',
+          })
+          .catch(err => {
+            result = err;
+          });
       });
 
-      result = await service.update(
-        ({ name: 'newDocName' } as unknown) as Document,
-        'userId',
-        { _id: 'docId' },
-      );
-    });
-
-    it('should request the document from the database', () => {
-      expect(repo.findOne).toHaveBeenCalledWith({
-        _id: 'docId',
-        user: 'userId',
+      it('should throw a not found exception', () => {
+        expect(exceptions.NotFoundException).toHaveBeenCalled();
       });
     });
 
-    it('should save the updated document', () => {
-      expect(repo.save).toHaveBeenCalledWith({ name: 'newDocName' });
-    });
+    describe('when a document is found', () => {
+      beforeEach(async () => {
+        (repo.findOne as jest.Mock).mockResolvedValue({
+          name: 'oldDocName',
+        });
+        (repo.save as jest.Mock).mockResolvedValue({
+          name: 'newDocName',
+          user: 'userId',
+        });
 
-    it('should return the updated document', () => {
-      expect(result).toEqual({ name: 'newDocName', user: 'userId' });
+        result = await service.update(
+          ({ name: 'newDocName' } as unknown) as Document,
+          'userId',
+          { _id: 'docId' },
+        );
+      });
+
+      it('should request the document from the database', () => {
+        expect(repo.findOne).toHaveBeenCalledWith({
+          _id: 'docId',
+          user: 'userId',
+        });
+      });
+
+      it('should save the updated document', () => {
+        expect(repo.save).toHaveBeenCalledWith({ name: 'newDocName' });
+      });
+
+      it('should return the updated document', () => {
+        expect(result).toEqual({ name: 'newDocName', user: 'userId' });
+      });
     });
   });
 
   describe('when deleting a document from the database', () => {
-    beforeEach(async () => {
-      (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 1 });
-      result = await service.delete('docId', 'userId');
-    });
+    describe('when a document is deleted', () => {
+      beforeEach(async () => {
+        (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 1 });
+        result = await service.delete('docId', 'userId');
+      });
 
-    it('should request to delete the document', () => {
-      expect(repo.delete).toHaveBeenCalledWith({
-        _id: 'docId',
-        user: 'userId',
+      it('should request to delete the document', () => {
+        expect(repo.delete).toHaveBeenCalledWith({
+          _id: 'docId',
+          user: 'userId',
+        });
+      });
+
+      it('should not return anything', () => {
+        expect(result).toBe(undefined);
       });
     });
 
-    it('should not return anything', () => {
-      expect(result).toBe(undefined);
+    describe('when a document is not deleted', () => {
+      let fn;
+      beforeEach(async () => {
+        (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 0 });
+        service.delete('docId', 'userId').catch(err => {
+          result = err;
+        });
+      });
+
+      it('should throw a not found exception', async () => {
+        expect(exceptions.NotFoundException).toHaveBeenCalled();
+      });
     });
   });
 
