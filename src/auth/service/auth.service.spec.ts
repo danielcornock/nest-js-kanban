@@ -66,7 +66,7 @@ describe('AuthService', () => {
         });
 
         it('should save the user to the database', () => {
-          expect(repo.save).toHaveBeenCalledWith({ data: mockUserReq });
+          expect(repo.save).toHaveBeenCalled();
         });
 
         it('should return the created usser', () => {

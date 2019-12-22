@@ -1,23 +1,15 @@
 export class MongooseModelMock {
   constructor(public data?: any) {}
 
-  public save(...args) {
-    return undefined;
-  }
+  public save = jest.fn();
 
-  public select(...args) {
-    return undefined;
-  }
+  public select = jest.fn();
 
-  public findOne(...args) {
-    return undefined;
-  }
+  public findOne = jest.fn();
 
-  public deleteOne(...args) {
-    return undefined;
-  }
+  public deleteOne = jest.fn();
 
-  public static findOne(...args) {
-    return undefined;
-  }
+  public find = jest.fn();
+
+  public static findOne = jest.fn();
 }
