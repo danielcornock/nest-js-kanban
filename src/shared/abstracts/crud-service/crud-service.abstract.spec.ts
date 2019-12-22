@@ -3,6 +3,8 @@ import { Document, Model } from 'mongoose';
 import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../database/factory/repo.factory';
 import { IUser } from 'src/auth/model/user';
+import { NotFoundException } from '@nestjs/common';
+import { RepoFactoryStub } from '../../../shared/database/factory/repo.factory.stub';
 
 const model = new MongooseModelMock();
 
@@ -16,40 +18,52 @@ describe('CrudService', () => {
     model = (new MongooseModelMock() as Partial<Model<Document>>) as Model<
       Document
     >;
-    repo = RepoFactory.create<Document>(model);
+    repo = (new RepoFactoryStub() as Partial<
+      RepoFactory<Document>
+    >) as RepoFactory<Document>;
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
     service = new TestCrudService(model);
   });
 
   describe('when fetching one document from the database', () => {
-    beforeEach(async () => {
-      jest.spyOn(repo, 'findOne').mockResolvedValue(({
-        _id: 'returnId',
-      } as unknown) as Document);
+    describe('when a document is found', () => {
+      beforeEach(async () => {
+        (repo.findOne as jest.Mock).mockResolvedValue({
+          _id: 'returnId',
+        });
 
-      result = await service.findOne({ _id: 'docId' }, 'userId');
-    });
+        result = await service.findOne({ _id: 'docId' }, 'userId');
+      });
 
-    it('should process the data and request the document', () => {
-      expect(repo.findOne).toHaveBeenCalledWith({
-        _id: 'docId',
-        user: 'userId',
+      it('should process the data and request the document', () => {
+        expect(repo.findOne).toHaveBeenCalledWith({
+          _id: 'docId',
+          user: 'userId',
+        });
+      });
+
+      it('should return the requested document', () => {
+        expect(result).toEqual({ _id: 'returnId' });
       });
     });
 
-    it('should return the requested document', () => {
-      expect(result).toEqual({ _id: 'returnId' });
+    describe('when a document is not found', () => {
+      beforeEach(async () => {
+        (repo.findOne as jest.Mock).mockResolvedValue(undefined);
+        service.findOne({ _id: 'docId' }, 'userId').catch(err => {
+          result = err;
+        });
+      });
+
+      it('should throw an error', () => {
+        expect(result).toBeInstanceOf(NotFoundException);
+      });
     });
   });
 
   describe('when fetching multiple documents from the database', () => {
     beforeEach(async () => {
-      jest
-        .spyOn(repo, 'findMany')
-        .mockResolvedValue(([{ _id: 'returnId' }] as unknown) as Array<
-          Document
-        >);
-
+      (repo.findMany as jest.Mock).mockResolvedValue([{ _id: 'returnId' }]);
       result = await service.findMany('userId');
     });
 
@@ -58,21 +72,19 @@ describe('CrudService', () => {
     });
 
     it('should return the requested documents', () => {
-      expect(result).toEqual(([{ _id: 'returnId' }] as unknown) as Array<
-        Document
-      >);
+      expect(result).toEqual([{ _id: 'returnId' }]);
     });
   });
 
   describe('when updating a document in the database', () => {
     beforeEach(async () => {
-      jest
-        .spyOn(repo, 'findOne')
-        .mockResolvedValue(({ name: 'oldDocName' } as unknown) as Document);
-      jest.spyOn(repo, 'save').mockResolvedValue(({
+      (repo.findOne as jest.Mock).mockResolvedValue({
+        name: 'oldDocName',
+      });
+      (repo.save as jest.Mock).mockResolvedValue({
         name: 'newDocName',
         user: 'userId',
-      } as unknown) as Document);
+      });
 
       result = await service.update(
         ({ name: 'newDocName' } as unknown) as Document,
@@ -99,7 +111,7 @@ describe('CrudService', () => {
 
   describe('when deleting a document from the database', () => {
     beforeEach(async () => {
-      jest.spyOn(repo, 'delete').mockResolvedValue({ deletedCount: 1 });
+      (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 1 });
       result = await service.delete('docId', 'userId');
     });
 
@@ -110,10 +122,6 @@ describe('CrudService', () => {
       });
     });
 
-    it('should not throw an error', () => {
-      expect(service.delete).not.toThrow();
-    });
-
     it('should not return anything', () => {
       expect(result).toBe(undefined);
     });
@@ -121,16 +129,14 @@ describe('CrudService', () => {
 
   describe('when creating a new document in the database', () => {
     beforeEach(async () => {
-      jest.spyOn(repo, 'createEntity').mockReturnValue(({
+      (repo.createEntity as jest.Mock).mockReturnValue({
         _id: 'docId',
         user: 'userId',
-      } as unknown) as Document);
-      jest
-        .spyOn(repo, 'save')
-        .mockResolvedValue(({
-          _id: 'docId',
-          user: 'userId',
-        } as unknown) as Document);
+      });
+      (repo.save as jest.Mock).mockResolvedValue({
+        _id: 'docId',
+        user: 'userId',
+      });
 
       result = await service.create({ _id: 'docId' }, 'userId');
     });
