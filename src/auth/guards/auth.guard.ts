@@ -32,6 +32,7 @@ export class AuthGuard implements CanActivate {
 
   private async _authenticate(request: any): Promise<boolean> {
     const token = this._checkForJwt(request.headers.authorization);
+    if (!token) return false;
 
     const jwtVerify = promisify(verify);
 
@@ -52,12 +53,6 @@ export class AuthGuard implements CanActivate {
       token = auth.split(' ')[1];
     }
 
-    if (!token) {
-      throw new UnauthorizedException(
-        'You are not logged in. Please log in to continue.',
-      );
-    }
-
     return token;
   }
 
@@ -72,8 +67,8 @@ export class AuthGuard implements CanActivate {
 
       request.user = user;
       return true;
-    } catch {
-      throw new InternalServerErrorException();
+    } catch (e) {
+      throw e;
     }
   }
 }

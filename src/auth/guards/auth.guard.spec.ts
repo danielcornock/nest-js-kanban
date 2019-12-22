@@ -17,23 +17,29 @@ describe('AuthGuard', () => {
     authService: AuthService,
     context: ExecutionContext,
     http: Partial<HttpArgumentsHost>,
-    request: any,
+    validRequest: any,
+    invalidRequest: any,
     fetchUserSpy;
 
   beforeEach(() => {
     authService = (new AuthServiceMock() as unknown) as AuthService;
     guard = new AuthGuard(authService);
-    jest.spyOn(guard, 'canActivate');
 
     fetchUserSpy = jest.spyOn(authService, 'fetchUser');
 
-    request = {
+    validRequest = {
       headers: {
         authorization: 'Bearer jwt',
       },
     };
+
+    invalidRequest = {
+      headers: {
+        authorization: '',
+      },
+    };
     http = {
-      getRequest: jest.fn().mockReturnValue(request),
+      getRequest: jest.fn(),
     };
 
     context = ({
@@ -42,100 +48,100 @@ describe('AuthGuard', () => {
   });
 
   describe('when calling canActivate', () => {
-    let result: any;
+    let result: Promise<boolean>;
 
-    describe('on initialisation', () => {
+    describe('when a jwt is supplied', () => {
       beforeEach(() => {
-        guard.canActivate(context);
+        (http.getRequest as jest.Mock).mockReturnValue(validRequest);
       });
 
-      it('should switch the context to http', () => {
-        expect(context.switchToHttp).toHaveBeenCalledWith();
-      });
-
-      it('should get the request', () => {
-        expect(http.getRequest).toHaveBeenCalledWith();
-      });
-
-      it('should verify that the JWT is valid', () => {
-        expect(promFn.promisifiedFn).toHaveBeenCalledWith('jwt', jwtSecret);
-      });
-    });
-
-    describe('when the jwt can be verified', () => {
-      beforeEach(() => {
-        //* Promisify is used for JWT-Compare
-        promisifySpy.mockResolvedValue({ id: '0000' });
-        guard.canActivate(context);
-      });
-
-      it('should fetch the user', () => {
-        expect(authService.fetchUser).toHaveBeenCalledWith({ _id: '0000' });
-      });
-
-      describe('when a user can be found', () => {
+      describe('when the jwt can be verified', () => {
         beforeEach(() => {
-          fetchUserSpy.mockResolvedValue({ email: 'dan@me.com' });
-
-          result = guard.canActivate(context);
+          //* Promisify is used for JWT-Compare
+          promisifySpy.mockResolvedValue({ id: '0000' });
         });
 
-        it('should return true', async () => {
-          expect(await result).toBe(true);
-        });
-
-        describe('when the guard has finished running', () => {
+        describe('when a user can be found', () => {
           beforeEach(() => {
+            fetchUserSpy.mockResolvedValue({ email: 'dan@me.com' });
+            result = guard.canActivate(context) as Promise<boolean>;
+          });
+
+          it('should switch the context to http', () => {
+            expect(context.switchToHttp).toHaveBeenCalledWith();
+          });
+
+          it('should get the request', () => {
+            expect(http.getRequest).toHaveBeenCalledWith();
+          });
+
+          it('should verify that the JWT is valid', () => {
+            expect(promFn.promisifiedFn).toHaveBeenCalledWith('jwt', jwtSecret);
+          });
+
+          it('should fetch the user', () => {
+            expect(authService.fetchUser).toHaveBeenCalledWith({ _id: '0000' });
+          });
+
+          describe('when the guard has finished running', () => {
+            let resolvedResult: boolean;
+
+            beforeEach(async () => {
+              resolvedResult = await result;
+            });
+
+            it('should return true', () => {
+              expect(resolvedResult).toBe(true);
+            });
+
+            it('should attach the user to the request body', () => {
+              expect(validRequest.user).toEqual({ email: 'dan@me.com' });
+            });
+          });
+        });
+
+        describe('when a user cannot be found', () => {
+          beforeEach(() => {
+            fetchUserSpy.mockResolvedValue(null);
+            result = guard.canActivate(context) as Promise<boolean>;
+          });
+
+          it('should throw an error', async () => {
+            expect(guard.canActivate).toThrow();
+          });
+        });
+
+        describe('when something goes wrong when finding the user', () => {
+          beforeEach(() => {
+            fetchUserSpy.mockRejectedValue('reject');
             guard.canActivate(context);
           });
 
-          it('should attach the user to the request body', () => {
-            expect(request.user).toEqual({ email: 'dan@me.com' });
+          it('should throw an error', () => {
+            expect(guard.canActivate).toThrow();
           });
         });
       });
 
-      describe('when a user cannot be found', () => {
+      describe('when the jwt is not valid', () => {
         beforeEach(() => {
-          fetchUserSpy.mockResolvedValue(null);
-          result = guard.canActivate(context);
+          promisifySpy.mockRejectedValue('reject');
+          result = guard.canActivate(context) as Promise<boolean>;
         });
 
-        it('should throw a not found exception', async () => {
-          expect(guard.canActivate).toThrow();
-        });
-      });
-
-      describe('when finding a user rejects', () => {
-        beforeEach(() => {
-          fetchUserSpy.mockRejectedValue('reject');
-        });
-
-        it('should throw an internal server exception', () => {
-          expect(guard.canActivate).toThrow();
-        });
-      });
-
-      describe('when there is a database error', () => {
-        beforeEach(() => {
-          jest.spyOn(authService, 'fetchUser').mockRejectedValue('rejected');
-
-          guard.canActivate(context);
-        });
-
-        it('should throw a internal server error', () => {
-          expect(guard.canActivate).toThrow();
+        it('should throw an error', async () => {
+          expect(await result).toBe(false);
         });
       });
     });
 
-    describe('when the jwt is not valid', () => {
+    describe('when a jwt is not supplied', () => {
       beforeEach(() => {
-        promisifySpy.mockRejectedValue('reject');
-        result = guard.canActivate(context);
+        (http.getRequest as jest.Mock).mockReturnValue(invalidRequest);
+        result = guard.canActivate(context) as Promise<boolean>;
       });
 
-      it('should throw an error', async () => {
+      it('should return false', async () => {
         expect(await result).toBe(false);
       });
     });

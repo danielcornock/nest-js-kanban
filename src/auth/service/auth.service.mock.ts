@@ -1,20 +1,9 @@
-import { IUser } from '../model/user';
-import { RegisterDTO } from '../data/auth.dto';
-
 export class AuthServiceMock {
-  public async register(body: RegisterDTO): Promise<IUser> {
-    return {} as IUser;
-  }
+  public register = jest.fn();
 
-  public createJwt(): string {
-    return 'jwttoken';
-  }
+  public createJwt = jest.fn();
 
-  public async login(): Promise<IUser> {
-    return {} as IUser;
-  }
+  public login = jest.fn();
 
-  public async fetchUser(): Promise<IUser> {
-    return {} as IUser;
-  }
+  public fetchUser = jest.fn();
 }

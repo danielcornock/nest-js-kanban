@@ -26,7 +26,7 @@ describe('Auth Controller', () => {
       _id: '0000',
     } as IUser;
 
-    jest.spyOn(service, 'createJwt');
+    (service.createJwt as jest.Mock).mockReturnValue('jwttoken');
   });
 
   describe('when registering a new user', () => {
@@ -40,9 +40,9 @@ describe('Auth Controller', () => {
       } as IUser;
     });
 
-    describe('when the register method resolves successfully', () => {
+    describe('when the user registers successfully', () => {
       beforeEach(async () => {
-        jest.spyOn(service, 'register').mockResolvedValue(mockUserRes);
+        (service.register as jest.Mock).mockResolvedValue(mockUserRes);
         returnValue = await controller.register(mockUserReq);
       });
 
@@ -58,6 +58,19 @@ describe('Auth Controller', () => {
         expect(returnValue).toEqual({ jwt: 'jwttoken', user: mockUserRes });
       });
     });
+
+    describe('when something goes wrong when registering', () => {
+      beforeEach(() => {
+        (service.register as jest.Mock).mockRejectedValue('registerRejected');
+        controller.register(mockUserReq).catch(e => {
+          returnValue = e;
+        });
+      });
+
+      it('should return the error thrown', () => {
+        expect(returnValue).toBe('registerRejected');
+      });
+    });
   });
 
   describe('when attempting to log in', () => {
@@ -70,9 +83,9 @@ describe('Auth Controller', () => {
       } as IUser;
     });
 
-    describe('when the log in method resolves successfully', () => {
+    describe('when the user logs in successfully', () => {
       beforeEach(async () => {
-        jest.spyOn(service, 'login').mockResolvedValue(mockUserRes);
+        (service.login as jest.Mock).mockResolvedValue(mockUserRes);
         returnValue = await controller.login(mockUserReq);
       });
 
@@ -86,6 +99,19 @@ describe('Auth Controller', () => {
 
       it('should return the jwt and user object', () => {
         expect(returnValue).toEqual({ jwt: 'jwttoken', user: mockUserRes });
+      });
+    });
+
+    describe('when something goes wrong when logging in', () => {
+      beforeEach(() => {
+        (service.login as jest.Mock).mockRejectedValue('loginRejected');
+        controller.login(mockUserReq).catch(e => {
+          returnValue = e;
+        });
+      });
+
+      it('should return the error', () => {
+        expect(returnValue).toBe('loginRejected');
       });
     });
   });
