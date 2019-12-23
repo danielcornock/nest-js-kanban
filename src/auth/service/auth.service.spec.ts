@@ -30,7 +30,7 @@ describe('AuthService', () => {
       mockUserReq = {
         name: 'Tester',
         email: 'tester@mail.com',
-        password: 'password',
+        password: 'password'
       } as IUser;
     });
 
@@ -100,7 +100,7 @@ describe('AuthService', () => {
 
       mockUserReq = {
         email: 'tester@mail.com',
-        password: 'password',
+        password: 'password'
       } as IUser;
     });
 
@@ -127,9 +127,7 @@ describe('AuthService', () => {
       beforeEach(async () => {
         foundUser = new MongooseModelMock();
         (repo.findOne as jest.Mock).mockReturnValue(foundUser);
-        jest
-          .spyOn(foundUser, 'select')
-          .mockReturnValue({ password: '####' } as IUser);
+        jest.spyOn(foundUser, 'select').mockReturnValue({ password: '####' } as IUser);
       });
 
       describe('when the password is not a match', () => {
@@ -152,7 +150,7 @@ describe('AuthService', () => {
 
         it('should search for a matching user', () => {
           expect(repo.findOne).toHaveBeenCalledWith({
-            email: mockUserReq.email,
+            email: mockUserReq.email
           });
         });
 
@@ -181,11 +179,7 @@ describe('AuthService', () => {
     });
 
     it('should sign the token', () => {
-      expect(jwt.sign).toHaveBeenCalledWith(
-        { id: '001', name: 'testName' },
-        jwtSecret,
-        { expiresIn: jwtExpires },
-      );
+      expect(jwt.sign).toHaveBeenCalledWith({ id: '001', name: 'testName' }, jwtSecret, { expiresIn: jwtExpires });
     });
 
     it('should return the signed token', () => {

@@ -20,25 +20,21 @@ export class AuthController {
   @Post('/register')
   @UsePipes(new ValidationPipe())
   public async register(@Body() body: RegisterDTO): Promise<IAuthRes> {
-    try {
-      const user = await this._authService.register(body);
-      const jwt = this._authService.createJwt(user.name, user._id);
-
-      return { jwt, user };
-    } catch (e) {
+    const user = await this._authService.register(body).catch(e => {
       throw e;
-    }
+    });
+    const jwt = this._authService.createJwt(user.name, user._id);
+
+    return { jwt, user };
   }
 
   @Post('/login')
   public async login(@Body() body: LoginDTO): Promise<IAuthRes> {
-    try {
-      const user = await this._authService.login(body);
-      const jwt = this._authService.createJwt(user.name, user._id);
-
-      return { jwt, user };
-    } catch (e) {
+    const user = await this._authService.login(body).catch(e => {
       throw e;
-    }
+    });
+    const jwt = this._authService.createJwt(user.name, user._id);
+
+    return { jwt, user };
   }
 }

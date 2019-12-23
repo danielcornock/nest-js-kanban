@@ -11,7 +11,7 @@ describe('Auth Controller', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [{ provide: AuthService, useClass: AuthServiceMock }],
+      providers: [{ provide: AuthService, useClass: AuthServiceMock }]
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -23,7 +23,7 @@ describe('Auth Controller', () => {
       name: 'Tester',
       email: 'tester@mail.com',
       password: 'password',
-      _id: '0000',
+      _id: '0000'
     } as IUser;
 
     (service.createJwt as jest.Mock).mockReturnValue('jwttoken');
@@ -36,7 +36,7 @@ describe('Auth Controller', () => {
       mockUserReq = {
         name: 'Tester',
         email: 'tester@mail.com',
-        password: 'password',
+        password: 'password'
       } as IUser;
     });
 
@@ -79,7 +79,7 @@ describe('Auth Controller', () => {
     beforeEach(() => {
       mockUserReq = {
         email: 'test@test.com',
-        password: 'password',
+        password: 'password'
       } as IUser;
     });
 

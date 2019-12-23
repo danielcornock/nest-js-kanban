@@ -9,9 +9,10 @@ import { SharedModule } from './shared/shared.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response/response.interceptor';
 import { StoryModule } from './story/story.module';
+import { BoardModule } from './board/board.module';
 
 @Module({
-  imports: [AuthModule, SharedModule, StoryModule],
+  imports: [AuthModule, SharedModule, StoryModule, BoardModule],
   controllers: [AppController],
   providers: [AppService],
 })

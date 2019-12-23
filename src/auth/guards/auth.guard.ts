@@ -1,11 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { verify } from 'jsonwebtoken';
 import { jwtSecret } from '../../config/env/env';
@@ -22,9 +15,7 @@ export class AuthGuard implements CanActivate {
     this._authService = authService;
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
 
     return this._authenticate(request);
@@ -59,16 +50,15 @@ export class AuthGuard implements CanActivate {
   private async _attachUser(id: string, request: any): Promise<boolean> {
     let user: IUser;
 
-    try {
-      user = await this._authService.fetchUser({ _id: id });
-      if (!user) {
-        throw new NotFoundException('This user no longer exists!');
-      }
-
-      request.user = user;
-      return true;
-    } catch (e) {
+    user = await this._authService.fetchUser({ _id: id }).catch(e => {
       throw e;
+    });
+
+    if (!user) {
+      throw new NotFoundException('This user no longer exists!');
     }
+
+    request.user = user;
+    return true;
   }
 }
