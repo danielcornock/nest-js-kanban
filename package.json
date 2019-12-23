@@ -72,7 +72,12 @@
     "coveragePathIgnorePatterns": [
       ".mock.ts",
       ".stub.ts",
-      "utilities.ts"
+      "utilities.ts",
+      ".dto.ts",
+      ".module.ts",
+      ".provider.ts",
+      "promisifiedFn.ts",
+      ".test.ts"
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node"
