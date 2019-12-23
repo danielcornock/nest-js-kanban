@@ -1,6 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { IUser } from '../model/user';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
@@ -8,36 +6,26 @@ import { MongooseModelMock } from '../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../shared/database/factory/repo.factory';
 import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { Model } from 'mongoose';
-import { MongooseModel } from 'src/shared/database/mongoose/constants';
+import { RepoFactoryStub } from '../../shared/database/factory/repo.factory.stub';
+import * as exceptions from '@nestjs/common';
 
 describe('AuthService', () => {
-  let service: AuthService, repo: RepoFactory<IUser>;
+  let service: AuthService, repo: RepoFactory<IUser>, model: Model<IUser>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        {
-          provide: MongooseModel.USER,
-          useValue: MongooseModelMock,
-        },
-      ],
-    }).compile();
+    model = (new MongooseModelMock() as Partial<Model<IUser>>) as Model<IUser>;
+    repo = (new RepoFactoryStub() as unknown) as RepoFactory<IUser>;
 
-    repo = RepoFactory.create<IUser>(
-      (MongooseModelMock as Partial<Model<IUser>>) as Model<IUser>,
-    );
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
-
-    service = module.get<AuthService>(AuthService);
+    jest.spyOn(exceptions, 'NotFoundException' as any);
+    service = new AuthService(model);
   });
 
   describe('when a user is registering', () => {
-    let mockUserReq: IUser, returnValue: IUser, hashSpy, saveSpy;
+    let mockUserReq: IUser, returnValue: IUser, hashSpy;
 
     beforeEach(async () => {
       hashSpy = jest.spyOn(bcrypt, 'hash');
-      saveSpy = jest.spyOn(repo, 'save');
 
       mockUserReq = {
         name: 'Tester',
@@ -50,14 +38,42 @@ describe('AuthService', () => {
       jest.clearAllMocks();
     });
 
+    describe('when something goes wrong when creating the hash', () => {
+      beforeEach(done => {
+        hashSpy.mockRejectedValue('rejectedHash');
+        service.register(mockUserReq).catch(e => {
+          returnValue = e;
+          done();
+        });
+      });
+
+      it('should return the error', () => {
+        expect(returnValue).toBe('rejectedHash');
+      });
+    });
+
     describe('when the hash is successfully created', () => {
       beforeEach(() => {
         hashSpy.mockResolvedValue('####' as never);
       });
 
+      describe('when something goes wrong when saving the user', () => {
+        beforeEach(done => {
+          (repo.save as jest.Mock).mockRejectedValue('rejectedSave');
+          service.register(mockUserReq).catch(e => {
+            returnValue = e;
+            done();
+          });
+        });
+
+        it('should return the error', () => {
+          expect(returnValue).toBe('rejectedSave');
+        });
+      });
+
       describe('when the user has been saved', () => {
         beforeEach(async () => {
-          saveSpy.mockReturnValue('savedUser');
+          (repo.save as jest.Mock).mockReturnValue('savedUser');
           returnValue = await service.register(mockUserReq);
         });
 
@@ -77,10 +93,9 @@ describe('AuthService', () => {
   });
 
   describe('when a user is logging in', () => {
-    let mockUserReq: IUser, returnValue: IUser, findOneSpy, bcryptCompareSpy;
+    let mockUserReq: IUser, returnValue: IUser, bcryptCompareSpy;
 
     beforeEach(async () => {
-      findOneSpy = jest.spyOn(repo, 'findOne');
       bcryptCompareSpy = jest.spyOn(bcrypt, 'compare');
 
       mockUserReq = {
@@ -93,20 +108,45 @@ describe('AuthService', () => {
       jest.clearAllMocks();
     });
 
+    describe('when no matching users are found', () => {
+      beforeEach(done => {
+        const foundModel = new MongooseModelMock();
+        (repo.findOne as jest.Mock).mockReturnValue(foundModel);
+        jest.spyOn(foundModel, 'select').mockResolvedValue(undefined);
+        service.login(mockUserReq).catch(() => done());
+      });
+
+      it('should throw a not found exception', () => {
+        expect(exceptions.NotFoundException).toHaveBeenCalled();
+      });
+    });
+
     describe('when a matching user is found', () => {
       let foundUser: MongooseModelMock;
 
       beforeEach(async () => {
         foundUser = new MongooseModelMock();
-        findOneSpy.mockReturnValue(foundUser);
+        (repo.findOne as jest.Mock).mockReturnValue(foundUser);
         jest
           .spyOn(foundUser, 'select')
           .mockReturnValue({ password: '####' } as IUser);
       });
 
+      describe('when the password is not a match', () => {
+        beforeEach(done => {
+          jest.spyOn(exceptions, 'UnauthorizedException' as any);
+          bcryptCompareSpy.mockResolvedValue(false);
+          service.login(mockUserReq).catch(() => done());
+        });
+
+        it('should throw an unauthorised exception', () => {
+          expect(exceptions.UnauthorizedException).toHaveBeenCalled();
+        });
+      });
+
       describe('when the password is a match', () => {
         beforeEach(async () => {
-          bcryptCompareSpy.mockResolvedValue(true as never);
+          bcryptCompareSpy.mockResolvedValue(true);
           returnValue = await service.login(mockUserReq);
         });
 
@@ -135,9 +175,7 @@ describe('AuthService', () => {
     let returnValue: string;
 
     beforeEach(() => {
-      jest
-        .spyOn(jwt, 'sign')
-        .mockReturnValue(('jsonwebtoken' as unknown) as void);
+      jest.spyOn(jwt, 'sign').mockReturnValue('jsonwebtoken' as any);
 
       returnValue = service.createJwt('testName', '001');
     });

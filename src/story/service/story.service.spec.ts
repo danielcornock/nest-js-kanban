@@ -8,10 +8,9 @@ import { Model } from 'mongoose';
 import { MongooseModel } from '../../shared/database/mongoose/constants';
 
 describe('StoryService', () => {
-  let service: StoryService;
+  let service: StoryService, repo: RepoFactory<IStory>;
 
   beforeEach(async () => {
-    let repo: RepoFactory<IStory>;
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StoryService,

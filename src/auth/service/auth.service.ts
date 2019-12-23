@@ -42,9 +42,9 @@ export class AuthService extends BaseService<IUser> {
 
   private async _fetchUser(email: string): Promise<IUser> {
     const user: IUser = await this._findOne({ email }).select('+password');
-
-    if (!user)
+    if (!user) {
       throw new NotFoundException('No user found with that email address.');
+    }
 
     return user;
   }
