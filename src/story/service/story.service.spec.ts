@@ -16,14 +16,12 @@ describe('StoryService', () => {
         StoryService,
         {
           provide: MongooseModel.STORY,
-          useValue: MongooseModelMock,
-        },
-      ],
+          useValue: MongooseModelMock
+        }
+      ]
     }).compile();
 
-    repo = RepoFactory.create<IStory>(
-      (MongooseModelMock as Partial<Model<IStory>>) as Model<IStory>,
-    );
+    repo = RepoFactory.create<IStory>((MongooseModelMock as Partial<Model<IStory>>) as Model<IStory>);
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
     service = module.get<StoryService>(StoryService);

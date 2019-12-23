@@ -12,7 +12,7 @@ fdescribe('AppController', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [AuthModule, MongooseModule],
       controllers: [AppController],
-      providers: [AppService, AuthGuard],
+      providers: [AppService, AuthGuard]
     }).compile();
 
     appController = app.get<AppController>(AppController);

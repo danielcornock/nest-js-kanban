@@ -12,27 +12,18 @@ export abstract class BaseService<IDoc extends Document> {
   }
 
   protected _create<DTO>(body: DTO, userId?: string): IDoc {
-    return this._repo.createEntity(
-      this._model,
-      this._attachUserToBody(body, userId),
-    );
+    return this._repo.createEntity(this._model, this._attachUserToBody(body, userId));
   }
 
   protected _save(document: IDoc): Promise<IDoc> {
     return this._repo.save(document);
   }
 
-  protected _findOne(
-    query: IParams,
-    userId?: string,
-  ): DocumentQuery<IDoc, IDoc, {}> {
+  protected _findOne(query: IParams, userId?: string): DocumentQuery<IDoc, IDoc, {}> {
     return this._repo.findOne(this._attachUserToParams(query, userId));
   }
 
-  protected _findMany(
-    userId: string,
-    params?: IParams,
-  ): DocumentQuery<IDoc[], IDoc, {}> {
+  protected _findMany(userId: string, params?: IParams): DocumentQuery<IDoc[], IDoc, {}> {
     return this._repo.findMany(this._attachUserToParams(params, userId));
   }
 

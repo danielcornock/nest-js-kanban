@@ -1,11 +1,7 @@
 import { AuthGuard } from './auth.guard';
 import { AuthService } from '../service/auth.service';
-import { AuthServiceMock } from '../service/auth.service.mock';
-import {
-  ExecutionContext,
-  UnauthorizedException,
-  NotFoundException,
-} from '@nestjs/common';
+import { AuthServiceMock } from '../service/auth.service.stub';
+import { ExecutionContext, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { jwtSecret } from '../../config/env/env';
 import * as util from '../../config/utilties/utilities';
@@ -13,13 +9,7 @@ import * as promFn from '../../config/utilties/promisifiedFn';
 import { promisifySpy } from '../../config/utilties/utilities.test';
 
 describe('AuthGuard', () => {
-  let guard: AuthGuard,
-    authService: AuthService,
-    context: ExecutionContext,
-    http: Partial<HttpArgumentsHost>,
-    validRequest: any,
-    invalidRequest: any,
-    fetchUserSpy;
+  let guard: AuthGuard, authService: AuthService, context: ExecutionContext, http: Partial<HttpArgumentsHost>, validRequest: any, invalidRequest: any, fetchUserSpy;
 
   beforeEach(() => {
     authService = (new AuthServiceMock() as unknown) as AuthService;
@@ -29,21 +19,21 @@ describe('AuthGuard', () => {
 
     validRequest = {
       headers: {
-        authorization: 'Bearer jwt',
-      },
+        authorization: 'Bearer jwt'
+      }
     };
 
     invalidRequest = {
       headers: {
-        authorization: '',
-      },
+        authorization: ''
+      }
     };
     http = {
-      getRequest: jest.fn(),
+      getRequest: jest.fn()
     };
 
     context = ({
-      switchToHttp: jest.fn().mockReturnValue(http),
+      switchToHttp: jest.fn().mockReturnValue(http)
     } as unknown) as ExecutionContext;
   });
 

@@ -6,14 +6,14 @@ export const boardSchema = new Schema({
   columns: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Column',
-    },
-  ],
+      ref: 'Column'
+    }
+  ]
 });
 
-// export interface IBoard extends Document {
-//   title: string;
-//   storyNumAccum: number;
-//   user: string;
-//   columns: Array<IColumn>;
-// }
+export interface IBoard extends Document {
+  title: string;
+  storyNumAccum: number;
+  user: string;
+  columns: Array<string>;
+}

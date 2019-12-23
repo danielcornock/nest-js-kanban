@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { IUser } from 'src/auth/model/user';
-import { Document } from 'mongoose';
 
 export interface IReq extends Request {
   user: IUser;

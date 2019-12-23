@@ -13,7 +13,7 @@ describe('Story Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule],
       controllers: [StoryController],
-      providers: [{ provide: StoryService, useClass: StoryServiceStub }],
+      providers: [{ provide: StoryService, useClass: StoryServiceStub }]
     }).compile();
 
     controller = module.get<StoryController>(StoryController);
@@ -52,17 +52,14 @@ describe('Story Controller', () => {
     describe('when a story is found', () => {
       beforeEach(async () => {
         (service.findOne as jest.Mock).mockResolvedValue({
-          _id: 'storyId',
+          _id: 'storyId'
         });
 
         result = await controller.findOne('storyId', reqUserMock);
       });
 
       it('should call the story service to fetch the story', () => {
-        expect(service.findOne).toHaveBeenCalledWith(
-          { _id: 'storyId' },
-          'userId',
-        );
+        expect(service.findOne).toHaveBeenCalledWith({ _id: 'storyId' }, 'userId');
       });
 
       it('should return the story', () => {
@@ -114,21 +111,13 @@ describe('Story Controller', () => {
     describe('when a story is successfully updated', () => {
       beforeEach(async () => {
         (service.update as jest.Mock).mockResolvedValue('updatedStory');
-        result = await controller.update(
-          { title: 'test' } as IStory,
-          'storyId',
-          reqUserMock,
-        );
+        result = await controller.update({ title: 'test' } as IStory, 'storyId', reqUserMock);
       });
 
       it('should call the story service to update the story', () => {
-        expect(service.update).toHaveBeenCalledWith(
-          { title: 'test' },
-          'userId',
-          {
-            _id: 'storyId',
-          },
-        );
+        expect(service.update).toHaveBeenCalledWith({ title: 'test' }, 'userId', {
+          _id: 'storyId'
+        });
       });
 
       it('should return the updated story', () => {
@@ -139,9 +128,7 @@ describe('Story Controller', () => {
     describe('when something goes wrong', () => {
       beforeEach(async () => {
         (service.update as jest.Mock).mockRejectedValue('rejectedUpdate');
-        controller
-          .update({ title: 'test' } as IStory, 'storyId', reqUserMock)
-          .catch(e => (result = e));
+        controller.update({ title: 'test' } as IStory, 'storyId', reqUserMock).catch(e => (result = e));
       });
 
       it('should return the error', () => {
@@ -154,17 +141,11 @@ describe('Story Controller', () => {
     describe('when a story is successfully created', () => {
       beforeEach(async () => {
         (service.create as jest.Mock).mockResolvedValue('createdStory');
-        result = await controller.create(
-          { title: 'test' } as IStory,
-          reqUserMock,
-        );
+        result = await controller.create({ title: 'test' } as IStory, reqUserMock);
       });
 
       it('should call the story service to create the story', () => {
-        expect(service.create).toHaveBeenCalledWith(
-          { title: 'test' },
-          'userId',
-        );
+        expect(service.create).toHaveBeenCalledWith({ title: 'test' }, 'userId');
       });
 
       it('should return the created story', () => {
@@ -175,9 +156,7 @@ describe('Story Controller', () => {
     describe('when something goes wrong', () => {
       beforeEach(async () => {
         (service.create as jest.Mock).mockRejectedValue('rejectedCreate');
-        controller
-          .create({ title: 'test' } as IStory, reqUserMock)
-          .catch(e => (result = e));
+        controller.create({ title: 'test' } as IStory, reqUserMock).catch(e => (result = e));
       });
 
       it('should return the error', () => {

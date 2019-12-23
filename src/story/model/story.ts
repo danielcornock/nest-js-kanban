@@ -4,7 +4,7 @@ export const storySchema = new Schema({
   title: String,
   description: String,
   storyNumber: Number,
-  user: String,
+  user: String
 });
 
 export interface IStory extends Document {

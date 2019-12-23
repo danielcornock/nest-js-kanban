@@ -6,8 +6,7 @@ import { Database } from 'src/shared/database/constants';
 export const authProviders = [
   {
     provide: MongooseModel.USER,
-    useFactory: (connection: Connection) =>
-      connection.model('User', userSchema),
-    inject: [Database.CONNECTION],
-  },
+    useFactory: (connection: Connection) => connection.model('User', userSchema),
+    inject: [Database.CONNECTION]
+  }
 ];

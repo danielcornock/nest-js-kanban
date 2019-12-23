@@ -8,9 +8,7 @@ export class RepoFactory<D extends Document> {
     this._model = model;
   }
 
-  public static create<Doc extends Document>(
-    model: Model<Doc>,
-  ): RepoFactory<Doc> {
+  public static create<Doc extends Document>(model: Model<Doc>): RepoFactory<Doc> {
     return new RepoFactory<Doc>(model);
   }
 

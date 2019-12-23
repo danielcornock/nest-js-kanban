@@ -8,11 +8,7 @@ interface IUserRes {
 }
 
 describe('ResponseInterceptor', () => {
-  let interceptor: ResponseInterceptor,
-    result,
-    next: CallHandler,
-    context: ExecutionContext,
-    responseSubject: BehaviorSubject<IUserRes>;
+  let interceptor: ResponseInterceptor, result, next: CallHandler, context: ExecutionContext, responseSubject: BehaviorSubject<IUserRes>;
   beforeEach(() => {
     interceptor = new ResponseInterceptor();
 
@@ -20,9 +16,9 @@ describe('ResponseInterceptor', () => {
       user: ({
         _id: 'hello',
         __v: '0',
-        password: 'password',
+        password: 'password'
       } as unknown) as IUser,
-      array: [{ _id: 'arrayObj', __v: '0' }],
+      array: [{ _id: 'arrayObj', __v: '0' }]
     });
 
     context = {} as ExecutionContext;
@@ -30,7 +26,7 @@ describe('ResponseInterceptor', () => {
     next = {
       handle: () => {
         return responseSubject.asObservable();
-      },
+      }
     };
 
     jest.spyOn(next, 'handle');
@@ -64,7 +60,7 @@ describe('ResponseInterceptor', () => {
         result.subscribe(data => {
           expect(data).toEqual({
             user: { _id: 'hello', __v: undefined, password: undefined },
-            array: [{ _id: 'arrayObj' }],
+            array: [{ _id: 'arrayObj' }]
           });
           done();
         });

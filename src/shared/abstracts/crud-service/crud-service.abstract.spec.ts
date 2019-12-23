@@ -9,19 +9,12 @@ import { RepoFactoryStub } from '../../../shared/database/factory/repo.factory.s
 const model = new MongooseModelMock();
 
 describe('CrudService', () => {
-  let service: TestCrudService,
-    model: Model<Document>,
-    repo: RepoFactory<Document>,
-    result: any;
+  let service: TestCrudService, model: Model<Document>, repo: RepoFactory<Document>, result: any;
 
   beforeEach(() => {
-    model = (new MongooseModelMock() as Partial<Model<Document>>) as Model<
-      Document
-    >;
+    model = (new MongooseModelMock() as Partial<Model<Document>>) as Model<Document>;
 
-    repo = (new RepoFactoryStub() as Partial<
-      RepoFactory<Document>
-    >) as RepoFactory<Document>;
+    repo = (new RepoFactoryStub() as Partial<RepoFactory<Document>>) as RepoFactory<Document>;
 
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
@@ -34,7 +27,7 @@ describe('CrudService', () => {
     describe('when a document is found', () => {
       beforeEach(async () => {
         (repo.findOne as jest.Mock).mockResolvedValue({
-          _id: 'returnId',
+          _id: 'returnId'
         });
 
         result = await service.findOne({ _id: 'docId' }, 'userId');
@@ -43,7 +36,7 @@ describe('CrudService', () => {
       it('should process the data and request the document', () => {
         expect(repo.findOne).toHaveBeenCalledWith({
           _id: 'docId',
-          user: 'userId',
+          user: 'userId'
         });
       });
 
@@ -88,7 +81,7 @@ describe('CrudService', () => {
         (repo.findOne as jest.Mock).mockResolvedValue(undefined);
         service
           .update(({ name: 'newDocName' } as unknown) as Document, 'userId', {
-            _id: 'docId',
+            _id: 'docId'
           })
           .catch(err => {
             result = err;
@@ -103,24 +96,20 @@ describe('CrudService', () => {
     describe('when a document is found', () => {
       beforeEach(async () => {
         (repo.findOne as jest.Mock).mockResolvedValue({
-          name: 'oldDocName',
+          name: 'oldDocName'
         });
         (repo.save as jest.Mock).mockResolvedValue({
           name: 'newDocName',
-          user: 'userId',
+          user: 'userId'
         });
 
-        result = await service.update(
-          ({ name: 'newDocName' } as unknown) as Document,
-          'userId',
-          { _id: 'docId' },
-        );
+        result = await service.update(({ name: 'newDocName' } as unknown) as Document, 'userId', { _id: 'docId' });
       });
 
       it('should request the document from the database', () => {
         expect(repo.findOne).toHaveBeenCalledWith({
           _id: 'docId',
-          user: 'userId',
+          user: 'userId'
         });
       });
 
@@ -144,7 +133,7 @@ describe('CrudService', () => {
       it('should request to delete the document', () => {
         expect(repo.delete).toHaveBeenCalledWith({
           _id: 'docId',
-          user: 'userId',
+          user: 'userId'
         });
       });
 
@@ -172,11 +161,11 @@ describe('CrudService', () => {
     beforeEach(async () => {
       (repo.createEntity as jest.Mock).mockReturnValue({
         _id: 'docId',
-        user: 'userId',
+        user: 'userId'
       });
       (repo.save as jest.Mock).mockResolvedValue({
         _id: 'docId',
-        user: 'userId',
+        user: 'userId'
       });
 
       result = await service.create({ _id: 'docId' }, 'userId');
@@ -185,7 +174,7 @@ describe('CrudService', () => {
     it('should create a new entity for the document', () => {
       expect(repo.createEntity).toHaveBeenCalledWith(model, {
         _id: 'docId',
-        user: 'userId',
+        user: 'userId'
       });
     });
 

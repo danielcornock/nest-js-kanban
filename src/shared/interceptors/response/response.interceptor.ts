@@ -1,10 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor, InternalServerErrorException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -30,7 +24,7 @@ export class ResponseInterceptor implements NestInterceptor {
           }
         }
         return value;
-      }),
+      })
     );
   }
 }

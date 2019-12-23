@@ -7,9 +7,9 @@ export const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true,
+    lowercase: true
   },
-  password: { type: String, select: false },
+  password: { type: String, select: false }
 });
 
 export interface IUser extends Document {

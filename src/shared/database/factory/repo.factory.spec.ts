@@ -29,10 +29,7 @@ describe('RepoFactory', () => {
     let modelToCreate: any;
 
     beforeEach(() => {
-      result = factory.createEntity(
-        (MongooseModelMock as unknown) as Model<Document>,
-        {} as Document,
-      ) as any;
+      result = factory.createEntity((MongooseModelMock as unknown) as Model<Document>, {} as Document) as any;
     });
 
     it('should create a new entity', () => {
