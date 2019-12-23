@@ -71,7 +71,8 @@
     },
     "coveragePathIgnorePatterns": [
       ".mock.ts",
-      ".stub.ts"
+      ".stub.ts",
+      "utilities.ts"
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node"

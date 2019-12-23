@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: './config.env' });
 
-export const environment: string = process.env.NODE_ENV || 'development';
+export const environment: string = process.env.NODE_ENV;
 
 const dbPassword = encodeURIComponent(process.env.DB_PASSWORD);
 

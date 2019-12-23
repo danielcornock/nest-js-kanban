@@ -22,6 +22,7 @@ describe('ResponseInterceptor', () => {
         __v: '0',
         password: 'password',
       } as unknown) as IUser,
+      array: [{ _id: 'arrayObj', __v: '0' }],
     });
 
     context = {} as ExecutionContext;
@@ -36,19 +37,34 @@ describe('ResponseInterceptor', () => {
   });
 
   describe('when intercept is called', () => {
-    beforeEach(() => {
-      result = interceptor.intercept(context, next);
-    });
+    describe('when there is no value in the response', () => {
+      beforeEach(() => {
+        responseSubject.next(undefined);
+        result = interceptor.intercept(context, next);
+      });
 
-    it('should call the handle on the next object', () => {
-      expect(next.handle).toHaveBeenCalledWith();
+      it('should return undefined', done => {
+        result.subscribe(data => {
+          expect(data).toBeUndefined();
+          done();
+        });
+      });
     });
 
     describe('when there is a password and __v entry in the response object', () => {
+      beforeEach(() => {
+        result = interceptor.intercept(context, next);
+      });
+
+      it('should call the handle on the next object', () => {
+        expect(next.handle).toHaveBeenCalledWith();
+      });
+
       it('should set them as undefined', done => {
         result.subscribe(data => {
           expect(data).toEqual({
             user: { _id: 'hello', __v: undefined, password: undefined },
+            array: [{ _id: 'arrayObj' }],
           });
           done();
         });
