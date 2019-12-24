@@ -127,7 +127,7 @@ describe('CrudService', () => {
     describe('when a document is deleted', () => {
       beforeEach(async () => {
         (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 1 });
-        result = await service.delete('docId', 'userId');
+        result = await service.delete({ _id: 'docId' }, 'userId');
       });
 
       it('should request to delete the document', () => {
@@ -146,7 +146,7 @@ describe('CrudService', () => {
       let fn;
       beforeEach(async () => {
         (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 0 });
-        service.delete('docId', 'userId').catch(err => {
+        service.delete({ _id: 'userId' }, 'userId').catch(err => {
           result = err;
         });
       });

@@ -33,8 +33,8 @@ export abstract class CrudService<IDoc extends Document> extends BaseService<IDo
     return await this._save(document);
   }
 
-  public async delete(docId: string, userId: string): Promise<void> {
-    const result = await this._delete({ _id: docId }, userId);
+  public async delete(query: IParams, userId: string): Promise<void> {
+    const result = await this._delete(query, userId);
     if (!result.deletedCount) {
       throw new NotFoundException('The item you are trying to delete cannot be found!');
     }

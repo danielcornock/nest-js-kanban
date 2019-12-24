@@ -1,4 +1,4 @@
-export class CrudServiceStub<D> {
+export class CrudServiceStub {
   public findOne = jest.fn();
 
   public findMany = jest.fn();

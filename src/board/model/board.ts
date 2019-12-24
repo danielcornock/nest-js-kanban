@@ -5,8 +5,13 @@ export const boardSchema = new Schema({
   user: String,
   columns: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'Column'
+      name: String,
+      stories: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'story'
+        }
+      ]
     }
   ]
 });
