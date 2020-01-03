@@ -6,7 +6,7 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 import { BoardDTO } from '../data/board.dto';
 import { IReq } from '../../config/interfaces/middleware-params.interface';
 
-@Controller('boards')
+@Controller()
 @UseGuards(AuthGuard)
 export class BoardController extends BaseController<IBoard, BoardService> {
   constructor(boardService: BoardService) {

@@ -6,7 +6,7 @@ import { IReq } from '../../config/interfaces/middleware-params.interface';
 import { BaseController } from '../../shared/abstracts/base-controller.abstract.ts/base-controller.abstract';
 import { IStory } from '../model/story';
 
-@Controller('stories')
+@Controller()
 @UseGuards(AuthGuard)
 export class StoryController extends BaseController<IStory, StoryService> {
   constructor(storyService: StoryService) {

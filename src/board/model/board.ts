@@ -9,7 +9,7 @@ export const boardSchema = new Schema({
       stories: [
         {
           type: Schema.Types.ObjectId,
-          ref: 'story'
+          ref: 'Story'
         }
       ]
     }
