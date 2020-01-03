@@ -5,7 +5,7 @@ export const boardSchema = new Schema({
   user: String,
   columns: [
     {
-      name: String,
+      title: String,
       stories: [
         {
           type: Schema.Types.ObjectId,

@@ -15,6 +15,15 @@ export class BaseController<D extends Document, S extends CrudService<D>> {
     this._names = names;
   }
 
+  @Get('/list')
+  public async list(@Req() req: IReq) {
+    const documentList = await this._nativeService.list(req.user._id).catch(e => {
+      throw e;
+    });
+
+    return { [this._names.plural]: documentList };
+  }
+
   @Get('/')
   public async findAll(@Req() req: IReq) {
     const docs = await this._nativeService.findMany(req.user._id).catch(e => {

@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, UsePipes, ValidationPipe, Body, Req, Put, Param } from '@nestjs/common';
+import { Controller, Post, UseGuards, UsePipes, ValidationPipe, Body, Req, Put, Param, Get } from '@nestjs/common';
 import { BaseController } from '../../shared/abstracts/base-controller.abstract.ts/base-controller.abstract';
 import { IBoard } from '../model/board';
 import { BoardService } from '../service/board.service';
@@ -10,7 +10,7 @@ import { IReq } from '../../config/interfaces/middleware-params.interface';
 @UseGuards(AuthGuard)
 export class BoardController extends BaseController<IBoard, BoardService> {
   constructor(boardService: BoardService) {
-    super(boardService, { singular: 'story', plural: 'stories' });
+    super(boardService, { singular: 'board', plural: 'boards' });
   }
 
   @Post('/')
@@ -23,7 +23,7 @@ export class BoardController extends BaseController<IBoard, BoardService> {
     return { board };
   }
 
-  @Put(`:/${this._nativeId}`)
+  @Put(`/:${this._nativeId}`)
   @UsePipes(ValidationPipe)
   public async update(@Body() body: BoardDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq) {
     const board = await this._nativeService.update(body, req.user._id, { _id }).catch(e => {
