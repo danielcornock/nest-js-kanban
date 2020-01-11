@@ -15,8 +15,8 @@ export class StoryController extends BaseController<IStory, StoryService> {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  public async create(@Body() body: StoryDTO, @Req() req: IReq) {
-    const story = await this._nativeService.create(body, req.user._id).catch(e => {
+  public async create(@Body() body: StoryDTO, @Req() req: IReq, @Param('boardId') boardId: string) {
+    const story = await this._nativeService.createStory(body, boardId, req.user._id).catch(e => {
       throw e;
     });
 

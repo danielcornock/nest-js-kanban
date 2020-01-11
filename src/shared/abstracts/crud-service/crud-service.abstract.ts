@@ -33,6 +33,7 @@ export abstract class CrudService<IDoc extends Document> extends BaseService<IDo
     if (!document) {
       throw new NotFoundException('The item you are trying to edit cannot be found!');
     }
+
     Object.assign(document, body);
     return await this._save(document);
   }

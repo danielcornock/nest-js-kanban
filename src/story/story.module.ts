@@ -6,7 +6,7 @@ import { storyProviders } from './providers/story.providers';
 import { BoardModule } from 'src/board/board.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, BoardModule],
   controllers: [StoryController],
   providers: [StoryService, ...storyProviders]
 })
