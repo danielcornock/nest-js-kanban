@@ -1,7 +1,10 @@
 import { Schema, Document } from 'mongoose';
 export const boardSchema = new Schema({
   title: String,
-  storyNumAccum: Number,
+  storyNumAccum: {
+    type: Number,
+    default: 0
+  },
   user: String,
   columns: [
     {
