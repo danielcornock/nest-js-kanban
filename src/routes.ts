@@ -4,7 +4,7 @@ import { BoardModule } from './board/board.module';
 
 export const routes: Routes = [
   {
-    path: '/boards/:storyId/stories|/stories',
+    path: '/boards/:boardId/stories|stories',
     module: StoryModule
   },
   {
