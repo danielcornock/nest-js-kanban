@@ -24,10 +24,10 @@ describe('Board Controller', () => {
     describe('when a board is successfully updated', () => {
       beforeEach(async () => {
         (service.update as jest.Mock).mockResolvedValue('updatedBoard');
-        result = await controller.update({ title: 'test' } as IBoard, 'boardId', reqUserMock);
+        result = await controller.update({ title: 'test', storyNumAccum: 5 } as IBoard, 'boardId', reqUserMock);
       });
 
-      it('should call the board service to update the board', () => {
+      it('should call the board service to update the board without the story number accumulator', () => {
         expect(service.update).toHaveBeenCalledWith({ title: 'test' }, 'userId', {
           _id: 'boardId'
         });
