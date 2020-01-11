@@ -53,12 +53,12 @@ describe('Story Controller', () => {
   describe('when creating a new story', () => {
     describe('when a story is successfully created', () => {
       beforeEach(async () => {
-        (service.create as jest.Mock).mockResolvedValue('createdStory');
-        result = await controller.create({ title: 'test' } as IStory, reqUserMock);
+        (service.createStory as jest.Mock).mockResolvedValue('createdStory');
+        result = await controller.create({ title: 'test' } as IStory, reqUserMock, 'board-id');
       });
 
       it('should call the story service to create the story', () => {
-        expect(service.create).toHaveBeenCalledWith({ title: 'test' }, 'userId');
+        expect(service.createStory).toHaveBeenCalledWith({ title: 'test' }, 'board-id', 'userId');
       });
 
       it('should return the created story', () => {
@@ -68,8 +68,8 @@ describe('Story Controller', () => {
 
     describe('when something goes wrong', () => {
       beforeEach(async () => {
-        (service.create as jest.Mock).mockRejectedValue('rejectedCreate');
-        controller.create({ title: 'test' } as IStory, reqUserMock).catch(e => (result = e));
+        (service.createStory as jest.Mock).mockRejectedValue('rejectedCreate');
+        controller.create({ title: 'test' } as IStory, reqUserMock, 'board-id').catch(e => (result = e));
       });
 
       it('should return the error', () => {
