@@ -69,4 +69,50 @@ describe('BoardService', () => {
       });
     });
   });
+
+  describe('when finding a board', () => {
+    let mongooseQuery: MongooseQueryMock, result: Promise<Partial<IBoard>>;
+
+    beforeEach(() => {
+      mongooseQuery = new MongooseQueryMock();
+      (dependencies.repo.findOne as jest.Mock).mockReturnValue(mongooseQuery);
+    });
+
+    describe('when a board is found', () => {
+      beforeEach(() => {
+        (mongooseQuery.select as jest.Mock).mockResolvedValue({ title: 'board-title', storyNumAccum: 4 });
+
+        result = service.fetchBoardStoryNumber({ _id: 'board-id' }, 'user-id');
+      });
+
+      it('should search for a board based on the query', () => {
+        expect(dependencies.repo.findOne).toHaveBeenCalledWith({ _id: 'board-id', user: 'user-id' });
+      });
+
+      it('should add the story number accumulation to the response', () => {
+        expect(mongooseQuery.select).toHaveBeenCalledWith('+storyNumAccum');
+      });
+
+      it('should return the data', async () => {
+        expect(await result).toEqual({
+          title: 'board-title',
+          storyNumAccum: 4
+        });
+      });
+    });
+
+    describe('when a board is not found', () => {
+      beforeEach(() => {
+        (mongooseQuery.populate as jest.Mock).mockResolvedValue(undefined);
+
+        result = service.fetchBoardStoryNumber({ _id: 'board-id' }, 'user-id');
+      });
+
+      it('should throw an error', async () => {
+        result.catch(e => {
+          expect(e).toBeInstanceOf(NotFoundException);
+        });
+      });
+    });
+  });
 });

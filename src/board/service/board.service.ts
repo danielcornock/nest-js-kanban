@@ -18,5 +18,12 @@ export class BoardService extends CrudService<IBoard> {
     return doc;
   }
 
+  public async fetchBoardStoryNumber(query: IParams, userId: string): Promise<IBoard> {
+    const doc = await this._findOne(query, userId).select('+storyNumAccum');
+    if (!doc) throw new NotFoundException('The item you are looking for cannot be found!');
+
+    return doc;
+  }
+
   // TODO - add a function for the logic for adding the story to the board is moved to the API instead of the UI
 }

@@ -38,7 +38,7 @@ describe('StoryService', () => {
 
     describe('when a board is found with a story number', () => {
       beforeEach(() => {
-        (dependencies.boardService.findOne as jest.Mock).mockResolvedValue({
+        (dependencies.boardService.fetchBoardStoryNumber as jest.Mock).mockResolvedValue({
           storyNumAccum: 1,
           title: 'board-id'
         });
@@ -62,7 +62,7 @@ describe('StoryService', () => {
         });
 
         it('should find the matching board', () => {
-          expect(dependencies.boardService.findOne).toHaveBeenCalledWith({ _id: 'board-id' }, 'user-id');
+          expect(dependencies.boardService.fetchBoardStoryNumber).toHaveBeenCalledWith({ _id: 'board-id' }, 'user-id');
         });
 
         it('should save the story with the story number', () => {
@@ -90,7 +90,7 @@ describe('StoryService', () => {
 
     describe('when the story number is not set', () => {
       beforeEach(() => {
-        (dependencies.boardService.findOne as jest.Mock).mockResolvedValue({
+        (dependencies.boardService.fetchBoardStoryNumber as jest.Mock).mockResolvedValue({
           title: 'board-id'
         });
 

@@ -27,9 +27,6 @@ export class BoardController extends BaseController<IBoard, BoardService> {
   @Put(`/:${this._nativeId}`)
   @UsePipes(ValidationPipe)
   public async update(@Body() body: BoardDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromise<IBoard> {
-    //! Hacky workaround for bug where storyNumAccum was overwritten by stored value in UI.
-    delete (body as any).storyNumAccum;
-
     const board = await this._nativeService.update(body, req.user._id, { _id }).catch(e => {
       throw e;
     });

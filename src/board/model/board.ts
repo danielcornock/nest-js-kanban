@@ -3,7 +3,8 @@ export const boardSchema = new Schema({
   title: String,
   storyNumAccum: {
     type: Number,
-    default: 0
+    default: 0,
+    select: false
   },
   user: String,
   columns: [
@@ -21,7 +22,7 @@ export const boardSchema = new Schema({
 
 export interface IBoard extends Document {
   title: string;
-  storyNumAccum: number;
+  storyNumAccum?: number;
   user: string;
   columns: Array<string>;
 }

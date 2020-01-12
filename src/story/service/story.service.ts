@@ -17,7 +17,7 @@ export class StoryService extends CrudService<IStory> {
 
   public async createStory(body: Partial<IStory>, boardId: string, userId: string): Promise<IStory> {
     const story: IStory = this._create(body, userId);
-    const board = await this._boardService.findOne({ _id: boardId }, userId);
+    const board = await this._boardService.fetchBoardStoryNumber({ _id: boardId }, userId);
 
     this._bumpStoryNumber(board, story);
 
