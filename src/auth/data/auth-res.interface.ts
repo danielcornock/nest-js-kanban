@@ -1,6 +1,6 @@
 import { IUser } from '../model/user';
 
-interface IAuthInstance {
+export interface IAuthInstance {
   jwt: string;
   user: IUser;
 }

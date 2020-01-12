@@ -1,14 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { StoryService } from './story.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { MongooseModelMock } from '../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../shared/database/factory/repo.factory';
 import { IStory } from '../model/story';
 import { Model } from 'mongoose';
-import { MongooseModel } from '../../shared/database/mongoose/constants';
 import { BoardService } from '../../board/service/board.service';
 import { BoardServiceStub } from '../../board/service/board.service.stub';
-import { StoryServiceStub } from './story.service.stub';
 import { RepoFactoryStub } from '../../shared/database/factory/repo.factory.stub';
 
 describe('StoryService', () => {

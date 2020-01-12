@@ -1,5 +1,4 @@
 import { Schema, Document } from 'mongoose';
-import { IsString, IsEmail, MinLength, Validator } from 'class-validator';
 
 export const userSchema = new Schema({
   name: { type: String },

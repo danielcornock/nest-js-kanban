@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from '../service/auth.service';
 import { AuthServiceMock } from '../service/auth.service.stub';
 import { IUser } from '../model/user';
-import { IAuthRes } from '../data/auth-res.interface';
+import { IAuthInstance } from '../data/auth-res.interface';
 
 describe('Auth Controller', () => {
   let controller: AuthController, service: AuthService, mockUserRes: IUser;
@@ -30,7 +30,7 @@ describe('Auth Controller', () => {
   });
 
   describe('when registering a new user', () => {
-    let mockUserReq: IUser, returnValue: IAuthRes;
+    let mockUserReq: IUser, returnValue: IAuthInstance;
 
     beforeEach(async () => {
       mockUserReq = {
@@ -74,7 +74,7 @@ describe('Auth Controller', () => {
   });
 
   describe('when attempting to log in', () => {
-    let mockUserReq: IUser, returnValue: IAuthRes;
+    let mockUserReq: IUser, returnValue: IAuthInstance;
 
     beforeEach(() => {
       mockUserReq = {

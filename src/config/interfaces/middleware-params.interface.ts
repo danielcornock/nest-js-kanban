@@ -1,12 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, NextFunction } from 'express';
 import { IUser } from 'src/auth/model/user';
 
 export interface IReq extends Request {
   user: IUser;
-}
-
-export interface IRes<D> {
-  [key: string]: D;
 }
 
 export interface INext extends NextFunction {}

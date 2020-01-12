@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-  Inject,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, NotFoundException, UnauthorizedException, Inject } from '@nestjs/common';
 import { IUser } from '../model/user';
 import { Model } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
@@ -49,10 +43,7 @@ export class AuthService extends BaseService<IUser> {
     return user;
   }
 
-  private async _checkPasswordMatch(
-    loginPassword,
-    storedPassword,
-  ): Promise<void> {
+  private async _checkPasswordMatch(loginPassword, storedPassword): Promise<void> {
     const isMatch: boolean = await compare(loginPassword, storedPassword);
 
     if (!isMatch) {
