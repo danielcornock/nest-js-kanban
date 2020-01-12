@@ -15,11 +15,11 @@ export abstract class CrudService<IDoc extends Document> extends BaseService<IDo
     return doc;
   }
 
-  public async list(userId: string) {
+  public async list(userId: string): Promise<Array<Partial<IDoc>>> {
     return await this._findMany(userId).select('title');
   }
 
-  public async findMany(userId: string) {
+  public async findMany(userId: string): Promise<Array<IDoc>> {
     return await this._findMany(userId);
   }
 

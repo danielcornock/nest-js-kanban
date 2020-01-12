@@ -26,7 +26,7 @@ export class StoryService extends CrudService<IStory> {
     return updatedStory;
   }
 
-  private _bumpStoryNumber(board: IBoard, story: IStory) {
+  private _bumpStoryNumber(board: IBoard, story: IStory): void {
     if (board.storyNumAccum) {
       board.storyNumAccum++;
       story.storyNumber = board.storyNumAccum;
