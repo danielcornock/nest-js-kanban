@@ -8,4 +8,6 @@ export class CrudServiceStub {
   public update = jest.fn();
 
   public create = jest.fn();
+
+  public list = jest.fn();
 }

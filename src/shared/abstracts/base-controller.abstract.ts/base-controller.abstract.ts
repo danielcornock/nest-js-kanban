@@ -16,7 +16,7 @@ export class BaseController<D extends Document, S extends CrudService<D>> {
   }
 
   @Get('/')
-  public async findAll(@Req() req: IReq, @Param() param: any) {
+  public async findAll(@Req() req: IReq, @Param() param?: any) {
     const docs = await this._nativeService.findMany(req.user._id).catch(e => {
       throw e;
     });

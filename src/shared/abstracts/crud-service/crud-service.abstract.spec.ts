@@ -2,9 +2,9 @@ import { CrudService } from './crud-service.abstract';
 import { Document, Model } from 'mongoose';
 import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
 import { RepoFactory } from '../../database/factory/repo.factory';
-import { IUser } from 'src/auth/model/user';
 import * as exceptions from '@nestjs/common';
 import { RepoFactoryStub } from '../../../shared/database/factory/repo.factory.stub';
+import { MongooseQueryMock } from '../../../testing/mongoose-query.mock';
 
 const model = new MongooseModelMock();
 
@@ -71,6 +71,34 @@ describe('CrudService', () => {
 
     it('should return the requested documents', () => {
       expect(result).toEqual([{ _id: 'returnId' }]);
+    });
+  });
+
+  describe('when fetching a list of items from the database', () => {
+    let mongooseQueryMock: MongooseQueryMock;
+
+    beforeEach(() => {
+      mongooseQueryMock = new MongooseQueryMock();
+      (repo.findMany as jest.Mock).mockReturnValue(mongooseQueryMock);
+    });
+
+    describe('when the documents are found', () => {
+      beforeEach(() => {
+        (mongooseQueryMock.select as jest.Mock).mockResolvedValue(['document-list']);
+        result = service.list('user-id');
+      });
+
+      it('should request the documents from the repo', () => {
+        expect(repo.findMany).toHaveBeenCalledWith({ user: 'user-id' });
+      });
+
+      it('should only select the title', () => {
+        expect(mongooseQueryMock.select).toHaveBeenCalledWith('title');
+      });
+
+      it('should return the found documents', async () => {
+        expect(await result).toEqual(['document-list']);
+      });
     });
   });
 

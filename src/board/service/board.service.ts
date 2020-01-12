@@ -18,7 +18,5 @@ export class BoardService extends CrudService<IBoard> {
     return doc;
   }
 
-  public async addStory(boardId: string, userId: string) {
-    const board = await this._findOne({ _id: boardId }, userId);
-  }
+  // TODO - add a function for the logic for adding the story to the board is moved to the API instead of the UI
 }

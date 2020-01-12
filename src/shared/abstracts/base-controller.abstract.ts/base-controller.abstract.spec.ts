@@ -1,9 +1,6 @@
 import { BaseController } from './base-controller.abstract';
 import { CrudService } from '../crud-service/crud-service.abstract';
-import { StoryServiceStub } from '../../../story/service/story.service.stub';
-import { Document } from 'mongoose';
 import { IStory } from '../../../story/model/story';
-import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
 import { reqUserMock } from '../../../testing/req-user.mock';
 
 import { CrudServiceStub } from '../crud-service/crud-service.stub';
@@ -42,6 +39,38 @@ describe('BaseController', () => {
 
       it('should return the error', () => {
         expect(result).toBe('rejectedFindMany');
+      });
+    });
+  });
+
+  describe('when getting a list of the documents', () => {
+    describe('when the documents are successfully found', () => {
+      beforeEach(() => {
+        (service.list as jest.Mock).mockResolvedValue(['documents-list']);
+        result = controller.list(reqUserMock);
+      });
+
+      it('should call the document service to fetch a list of all documents', () => {
+        expect(service.list).toHaveBeenCalledWith(reqUserMock.user._id);
+      });
+
+      it('should return the documents', async () => {
+        expect(await result).toEqual({
+          documents: ['documents-list']
+        });
+      });
+    });
+
+    describe('when something goes wrong§', () => {
+      beforeEach(() => {
+        (service.list as jest.Mock).mockRejectedValue('rejectedList');
+        result = controller.list(reqUserMock);
+      });
+
+      it('should throw an error', () => {
+        result.catch(e => {
+          expect(e).toBe('rejectedList');
+        });
       });
     });
   });

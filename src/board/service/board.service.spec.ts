@@ -1,32 +1,72 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BoardService } from './board.service';
-import { RepoFactory } from '../../shared/database/factory/repo.factory';
 import { IBoard } from '../model/board';
-import { MongooseModel } from '../../shared/database/mongoose/constants';
 import { MongooseModelMock } from '../../testing/mongoose-model.mock';
+import { MongooseQueryMock } from '../../testing/mongoose-query.mock';
 import { Model } from 'mongoose';
+import { RepoFactory } from '../../shared/database/factory/repo.factory';
+import { RepoFactoryStub } from '../../shared/database/factory/repo.factory.stub';
+import { NotFoundException } from '@nestjs/common';
 
 describe('BoardService', () => {
-  let service: BoardService, repo: RepoFactory<IBoard>;
+  let service: BoardService,
+    dependencies: {
+      mongooseModel: Model<IBoard>;
+      repo: RepoFactory<IBoard>;
+    };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        BoardService,
-        {
-          provide: MongooseModel.BOARD,
-          useValue: MongooseModelMock
-        }
-      ]
-    }).compile();
+    dependencies = {
+      mongooseModel: (new MongooseModelMock() as unknown) as Model<IBoard>,
+      repo: (new RepoFactoryStub() as Partial<RepoFactory<IBoard>>) as RepoFactory<IBoard>
+    };
 
-    repo = RepoFactory.create<IBoard>((MongooseModelMock as Partial<Model<IBoard>>) as Model<IBoard>);
-    jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
+    jest.spyOn(RepoFactory, 'create').mockReturnValue(dependencies.repo);
 
-    service = module.get<BoardService>(BoardService);
+    service = new BoardService(dependencies.mongooseModel);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('when finding a board', () => {
+    let mongooseQuery: MongooseQueryMock, result: Promise<Partial<IBoard>>;
+
+    beforeEach(() => {
+      mongooseQuery = new MongooseQueryMock();
+      (dependencies.repo.findOne as jest.Mock).mockReturnValue(mongooseQuery);
+    });
+
+    describe('when a board is found', () => {
+      beforeEach(() => {
+        (mongooseQuery.populate as jest.Mock).mockResolvedValue({ title: 'board-title' });
+
+        result = service.findOne({ _id: 'board-id' }, 'user-id');
+      });
+
+      it('should search for a board based on the query', () => {
+        expect(dependencies.repo.findOne).toHaveBeenCalledWith({ _id: 'board-id', user: 'user-id' });
+      });
+
+      it('should populate the stories in the response', () => {
+        expect(mongooseQuery.populate).toHaveBeenCalledWith('columns.stories');
+      });
+
+      it('should return the data', async () => {
+        expect(await result).toEqual({
+          title: 'board-title'
+        });
+      });
+    });
+
+    describe('when a board is not found', () => {
+      beforeEach(() => {
+        (mongooseQuery.populate as jest.Mock).mockResolvedValue(undefined);
+
+        result = service.findOne({ _id: 'board-id' }, 'user-id');
+      });
+
+      it('should throw an error', async () => {
+        result.catch(e => {
+          expect(e).toBeInstanceOf(NotFoundException);
+        });
+      });
+    });
   });
 });

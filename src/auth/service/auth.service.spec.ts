@@ -8,6 +8,7 @@ import { jwtSecret, jwtExpires } from '../../config/env/env';
 import { Model } from 'mongoose';
 import { RepoFactoryStub } from '../../shared/database/factory/repo.factory.stub';
 import * as exceptions from '@nestjs/common';
+import { MongooseQueryMock } from '../../testing/mongoose-query.mock';
 
 describe('AuthService', () => {
   let service: AuthService, repo: RepoFactory<IUser>, model: Model<IUser>;
@@ -110,7 +111,7 @@ describe('AuthService', () => {
 
     describe('when no matching users are found', () => {
       beforeEach(done => {
-        const foundModel = new MongooseModelMock();
+        const foundModel = new MongooseQueryMock();
         (repo.findOne as jest.Mock).mockReturnValue(foundModel);
         jest.spyOn(foundModel, 'select').mockResolvedValue(undefined);
         service.login(mockUserReq).catch(() => done());
@@ -122,10 +123,10 @@ describe('AuthService', () => {
     });
 
     describe('when a matching user is found', () => {
-      let foundUser: MongooseModelMock;
+      let foundUser: MongooseQueryMock;
 
       beforeEach(async () => {
-        foundUser = new MongooseModelMock();
+        foundUser = new MongooseQueryMock();
         (repo.findOne as jest.Mock).mockReturnValue(foundUser);
         jest.spyOn(foundUser, 'select').mockReturnValue({ password: '####' } as IUser);
       });

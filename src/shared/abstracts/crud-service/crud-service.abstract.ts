@@ -1,7 +1,7 @@
 import { BaseService } from '../base-service.abstract';
 import { Document, Model } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
-import { IParams } from 'src/config/interfaces/params.interface';
+import { IParams } from '../../../config/interfaces/params.interface';
 
 export abstract class CrudService<IDoc extends Document> extends BaseService<IDoc> {
   constructor(mongooseModel: Model<IDoc>) {
