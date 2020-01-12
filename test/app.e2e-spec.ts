@@ -3,9 +3,6 @@ import { INestApplication, ForbiddenException } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-const headers = {
-  authorization: 
-}
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
