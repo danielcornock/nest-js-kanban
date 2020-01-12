@@ -5,6 +5,7 @@ import { StoryDTO } from '../data/story.dto';
 import { IReq } from '../../config/interfaces/middleware-params.interface';
 import { BaseController } from '../../shared/abstracts/base-controller.abstract.ts/base-controller.abstract';
 import { IStory } from '../model/story';
+import { IModelPromise } from 'src/config/interfaces/http/model-response.interface';
 
 @Controller()
 @UseGuards(AuthGuard)
@@ -15,7 +16,7 @@ export class StoryController extends BaseController<IStory, StoryService> {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  public async create(@Body() body: StoryDTO, @Req() req: IReq, @Param('boardId') boardId: string) {
+  public async create(@Body() body: StoryDTO, @Req() req: IReq, @Param('boardId') boardId: string): IModelPromise<IStory> {
     const story = await this._nativeService.createStory(body, boardId, req.user._id).catch(e => {
       throw e;
     });
@@ -25,7 +26,7 @@ export class StoryController extends BaseController<IStory, StoryService> {
 
   @Put(`:/${this._nativeId}`)
   @UsePipes(ValidationPipe)
-  public async update(@Body() body: StoryDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq) {
+  public async update(@Body() body: StoryDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromise<IStory> {
     const story = await this._nativeService.update(body, req.user._id, { _id }).catch(e => {
       throw e;
     });

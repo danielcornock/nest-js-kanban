@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RegisterDTO, LoginDTO } from '../data/auth.dto';
 import { AuthService } from '../service/auth.service';
-import { IAuthRes } from '../data/auth-res.interface';
+import { IAuthPromise } from '../data/auth-res.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +13,7 @@ export class AuthController {
 
   @Post('/register')
   @UsePipes(new ValidationPipe())
-  public async register(@Body() body: RegisterDTO): Promise<IAuthRes> {
+  public async register(@Body() body: RegisterDTO): IAuthPromise {
     const user = await this._authService.register(body).catch(e => {
       throw e;
     });
@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Post('/login')
-  public async login(@Body() body: LoginDTO): Promise<IAuthRes> {
+  public async login(@Body() body: LoginDTO): IAuthPromise {
     const user = await this._authService.login(body).catch(e => {
       throw e;
     });

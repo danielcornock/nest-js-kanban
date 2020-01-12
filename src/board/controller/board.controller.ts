@@ -5,6 +5,7 @@ import { BoardService } from '../service/board.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { BoardDTO } from '../data/board.dto';
 import { IReq } from '../../config/interfaces/middleware-params.interface';
+import { IModelPromise } from '../../config/interfaces/http/model-response.interface';
 
 @Controller()
 @UseGuards(AuthGuard)
@@ -15,7 +16,7 @@ export class BoardController extends BaseController<IBoard, BoardService> {
 
   @Post('/')
   @UsePipes(ValidationPipe)
-  public async create(@Body() body: BoardDTO, @Req() req: IReq) {
+  public async create(@Body() body: BoardDTO, @Req() req: IReq): IModelPromise<IBoard> {
     const board = await this._nativeService.create(body, req.user._id).catch(e => {
       throw e;
     });
@@ -25,7 +26,7 @@ export class BoardController extends BaseController<IBoard, BoardService> {
 
   @Put(`/:${this._nativeId}`)
   @UsePipes(ValidationPipe)
-  public async update(@Body() body: BoardDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq) {
+  public async update(@Body() body: BoardDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromise<IBoard> {
     //! Hacky workaround for bug where storyNumAccum was overwritten by stored value in UI.
     delete (body as any).storyNumAccum;
 
