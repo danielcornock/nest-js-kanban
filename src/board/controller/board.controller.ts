@@ -17,7 +17,7 @@ export class BoardController extends BaseController<IBoard, BoardService> {
   @Post('/')
   @UsePipes(ValidationPipe)
   public async create(@Body() body: BoardDTO, @Req() req: IReq): IModelPromise<IBoard> {
-    const board = await this._nativeService.create(body, req.user._id).catch(e => {
+    const board = await this._nativeService.createBoard(body, req.user._id).catch(e => {
       throw e;
     });
 

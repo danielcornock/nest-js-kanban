@@ -3,4 +3,5 @@ import { CrudServiceStub } from '../../shared/abstracts/crud-service/crud-servic
 export class BoardServiceStub extends CrudServiceStub {
   public findOne = jest.fn();
   public fetchBoardStoryNumber = jest.fn();
+  public createBoard = jest.fn();
 }

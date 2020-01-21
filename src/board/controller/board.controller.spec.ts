@@ -58,7 +58,7 @@ describe('Board Controller', () => {
       });
 
       it('should call the board service to create the board', () => {
-        expect(service.create).toHaveBeenCalledWith({ title: 'test' }, 'userId');
+        expect(service.createBoard).toHaveBeenCalledWith({ title: 'test' }, 'userId');
       });
 
       it('should return the created story', () => {
