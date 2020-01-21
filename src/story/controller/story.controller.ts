@@ -1,4 +1,4 @@
-import { Controller, Post, UsePipes, ValidationPipe, Body, Req, UseGuards, Put, Param, Get } from '@nestjs/common';
+import { Controller, Post, UsePipes, ValidationPipe, Body, Req, UseGuards, Put, Param } from '@nestjs/common';
 import { StoryService } from '../service/story.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { StoryDTO } from '../data/story.dto';
