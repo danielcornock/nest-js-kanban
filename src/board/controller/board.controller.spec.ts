@@ -53,7 +53,7 @@ describe('Board Controller', () => {
   describe('when creating a new board', () => {
     describe('when a board is successfully created', () => {
       beforeEach(async () => {
-        (service.create as jest.Mock).mockResolvedValue('createdStory');
+        (service.createBoard as jest.Mock).mockResolvedValue('createdStory');
         result = await controller.create({ title: 'test' } as IBoard, reqUserMock);
       });
 
@@ -68,7 +68,7 @@ describe('Board Controller', () => {
 
     describe('when something goes wrong', () => {
       beforeEach(async () => {
-        (service.create as jest.Mock).mockRejectedValue('rejectedCreate');
+        (service.createBoard as jest.Mock).mockRejectedValue('rejectedCreate');
         controller.create({ title: 'test' } as IBoard, reqUserMock).catch(e => (result = e));
       });
 
