@@ -4,7 +4,13 @@ export const storySchema = new Schema({
   title: String,
   description: String,
   storyNumber: Number,
-  user: String
+  user: String,
+  tags: [
+    {
+      label: String,
+      color: String
+    }
+  ]
 });
 
 export interface IStory extends Document {

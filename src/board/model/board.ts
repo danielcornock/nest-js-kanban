@@ -1,23 +1,36 @@
 import { Schema, Document } from 'mongoose';
-export const boardSchema = new Schema({
-  title: String,
-  storyNumAccum: {
-    type: Number,
-    default: 0,
-    select: false
+export const boardSchema = new Schema(
+  {
+    title: String,
+    storyNumAccum: {
+      type: Number,
+      default: 0,
+      select: false
+    },
+    user: String,
+    columns: [
+      {
+        title: String,
+        stories: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'Story'
+          }
+        ]
+      }
+    ]
   },
-  user: String,
-  columns: [
-    {
-      title: String,
-      stories: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Story'
-        }
-      ]
-    }
-  ]
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
+);
+
+boardSchema.virtual('config', {
+  ref: 'BoardConfig',
+  foreignField: 'board',
+  localField: '_id',
+  justOne: true
 });
 
 export interface IBoard extends Document {
@@ -25,4 +38,5 @@ export interface IBoard extends Document {
   storyNumAccum?: number;
   user: string;
   columns: Array<string>;
+  config: string;
 }

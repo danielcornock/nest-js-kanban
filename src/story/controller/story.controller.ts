@@ -24,7 +24,7 @@ export class StoryController extends BaseController<IStory, StoryService> {
     return { story };
   }
 
-  @Put(`:/${this._nativeId}`)
+  @Put(`/:${this._nativeId}`)
   @UsePipes(ValidationPipe)
   public async update(@Body() body: StoryDTO, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromise<IStory> {
     const story = await this._nativeService.update(body, req.user._id, { _id }).catch(e => {
