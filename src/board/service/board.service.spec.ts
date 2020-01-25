@@ -8,6 +8,7 @@ import { RepoFactoryStub } from '../../shared/database/factory/repo.factory.stub
 import { NotFoundException } from '@nestjs/common';
 import { BoardConfigService } from '../../board-config/services/board-config.service';
 import { BoardConfigServiceStub } from '../../board-config/services/board-config.service.stub';
+import { defaultConfigValues } from '../../board-config/model/default-config-values';
 
 describe('BoardService', () => {
   let service: BoardService,
@@ -157,7 +158,7 @@ describe('BoardService', () => {
             });
 
             it('should create the board config', () => {
-              expect(dependencies.boardConfigService.create).toHaveBeenCalledWith({ board: 'board-id' }, 'user-id');
+              expect(dependencies.boardConfigService.create).toHaveBeenCalledWith({ board: 'board-id', ...defaultConfigValues }, 'user-id');
             });
 
             it('should return the saved board', async () => {

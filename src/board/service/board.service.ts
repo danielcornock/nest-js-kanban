@@ -5,6 +5,7 @@ import { MongooseModel } from '../../shared/database/mongoose/constants';
 import { Model } from 'mongoose';
 import { IParams } from '../../config/interfaces/params.interface';
 import { BoardConfigService } from '../../board-config/services/board-config.service';
+import { defaultConfigValues } from '../../board-config/model/default-config-values';
 
 @Injectable()
 export class BoardService extends CrudService<IBoard> {
@@ -32,7 +33,7 @@ export class BoardService extends CrudService<IBoard> {
   public async createBoard(body: Partial<IBoard>, userId: string): Promise<IBoard> {
     const board = this._create(body, userId);
     const savedBoard = await this._save(board);
-    await this._boardConfigService.create({ board: savedBoard._id }, userId);
+    await this._boardConfigService.create({ board: savedBoard._id, ...defaultConfigValues }, userId);
 
     return savedBoard;
   }
