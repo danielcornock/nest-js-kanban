@@ -10,3 +10,5 @@ export const storyProviders = [
     inject: [Database.CONNECTION]
   }
 ];
+
+export const storyDocumentNames = { singular: 'story', plural: 'stories' };
