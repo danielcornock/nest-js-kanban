@@ -4,4 +4,6 @@ export class BoardServiceStub extends CrudServiceStub {
   public findOne = jest.fn();
   public fetchBoardStoryNumber = jest.fn();
   public createBoard = jest.fn();
+  public addStoryToBoard = jest.fn();
+  public updateBoard = jest.fn();
 }

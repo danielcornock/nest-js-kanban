@@ -22,7 +22,9 @@ describe('BoardService', () => {
     dependencies = {
       mongooseModel: (new MongooseModelMock() as unknown) as Model<IBoard>,
       repo: (new RepoFactoryStub() as Partial<RepoFactory<IBoard>>) as RepoFactory<IBoard>,
-      boardConfigService: (new BoardConfigServiceStub() as Partial<BoardConfigService>) as BoardConfigService
+      boardConfigService: (new BoardConfigServiceStub() as Partial<
+        BoardConfigService
+      >) as BoardConfigService
     };
 
     jest.spyOn(RepoFactory, 'create').mockReturnValue(dependencies.repo);
@@ -47,7 +49,10 @@ describe('BoardService', () => {
       });
 
       it('should search for a board based on the query', () => {
-        expect(dependencies.repo.findOne).toHaveBeenCalledWith({ _id: 'board-id', user: 'user-id' });
+        expect(dependencies.repo.findOne).toHaveBeenCalledWith({
+          _id: 'board-id',
+          user: 'user-id'
+        });
       });
 
       it('should populate the stories in the response', () => {
@@ -90,13 +95,19 @@ describe('BoardService', () => {
 
     describe('when a board is found', () => {
       beforeEach(() => {
-        (mongooseQuery.select as jest.Mock).mockResolvedValue({ title: 'board-title', storyNumAccum: 4 });
+        (mongooseQuery.select as jest.Mock).mockResolvedValue({
+          title: 'board-title',
+          storyNumAccum: 4
+        });
 
         result = service.fetchBoardStoryNumber({ _id: 'board-id' }, 'user-id');
       });
 
       it('should search for a board based on the query', () => {
-        expect(dependencies.repo.findOne).toHaveBeenCalledWith({ _id: 'board-id', user: 'user-id' });
+        expect(dependencies.repo.findOne).toHaveBeenCalledWith({
+          _id: 'board-id',
+          user: 'user-id'
+        });
       });
 
       it('should add the story number accumulation to the response', () => {
@@ -126,6 +137,85 @@ describe('BoardService', () => {
     });
   });
 
+  describe('when updating a board', () => {
+    let result: IBoard;
+
+    describe('when the board is successfully found', () => {
+      beforeEach(async () => {
+        (dependencies.repo.findOne as jest.Mock).mockResolvedValue({
+          title: 'board-title'
+        });
+        (dependencies.repo.save as jest.Mock).mockResolvedValue('saved-board');
+        jest.spyOn(service, 'findOne').mockResolvedValue({} as IBoard);
+        result = await service.updateBoard({ _id: 'new-id' }, 'user-id', { _id: 'search-id' });
+      });
+
+      it('should fetch the board', () => {
+        expect(dependencies.repo.findOne).toHaveBeenCalledWith({
+          _id: 'search-id',
+          user: 'user-id'
+        });
+      });
+
+      it('should save the updated board', () => {
+        expect(dependencies.repo.save).toHaveBeenCalledWith({
+          _id: 'new-id',
+          title: 'board-title'
+        });
+      });
+
+      it('should fetch the updated board with references resolved', () => {
+        expect(service.findOne).toHaveBeenCalledWith({ _id: 'search-id' }, 'user-id');
+      });
+
+      it('should return the new board', () => {
+        expect(result).toEqual({});
+      });
+    });
+
+    describe('when something goes wrong', () => {
+      beforeEach(() => {
+        (dependencies.repo.findOne as jest.Mock).mockRejectedValue('err');
+        service.updateBoard({ _id: 'new-id' }, 'user-id', { _id: 'search-id' }).catch(err => {
+          result = err;
+        });
+      });
+
+      it('should return the error', () => {
+        expect(result).toBe('err');
+      });
+    });
+  });
+
+  describe('when adding a story to a board', () => {
+    beforeEach(() => {
+      (dependencies.repo.findOne as jest.Mock).mockResolvedValue({
+        columns: [
+          {
+            _id: 'column-id',
+            stories: []
+          }
+        ]
+      });
+      service.addStoryToBoard('story-id', 'column-id', 'board-id', 'user-id');
+    });
+
+    it('should fetch the board', () => {
+      expect(dependencies.repo.findOne).toHaveBeenCalledWith({ _id: 'board-id', user: 'user-id' });
+    });
+
+    it('should save the updated board', () => {
+      expect(dependencies.repo.save).toHaveBeenCalledWith({
+        columns: [
+          {
+            _id: 'column-id',
+            stories: ['story-id']
+          }
+        ]
+      });
+    });
+  });
+
   describe('when creating a board', () => {
     let result: Promise<IBoard>;
 
@@ -150,7 +240,13 @@ describe('BoardService', () => {
             });
 
             it('should create the entity', () => {
-              expect(dependencies.repo.createEntity).toHaveBeenCalledWith(dependencies.mongooseModel, { title: 'test-board', user: 'user-id' });
+              expect(dependencies.repo.createEntity).toHaveBeenCalledWith(
+                dependencies.mongooseModel,
+                {
+                  title: 'test-board',
+                  user: 'user-id'
+                }
+              );
             });
 
             it('should save the board', () => {
@@ -158,7 +254,10 @@ describe('BoardService', () => {
             });
 
             it('should create the board config', () => {
-              expect(dependencies.boardConfigService.create).toHaveBeenCalledWith({ board: 'board-id', ...defaultConfigValues }, 'user-id');
+              expect(dependencies.boardConfigService.create).toHaveBeenCalledWith(
+                { board: 'board-id', ...defaultConfigValues },
+                'user-id'
+              );
             });
 
             it('should return the saved board', async () => {

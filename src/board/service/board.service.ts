@@ -9,7 +9,10 @@ import { defaultConfigValues } from '../../board-config/model/default-config-val
 
 @Injectable()
 export class BoardService extends CrudService<IBoard> {
-  constructor(@Inject(MongooseModel.BOARD) boardModel: Model<IBoard>, private readonly _boardConfigService: BoardConfigService) {
+  constructor(
+    @Inject(MongooseModel.BOARD) boardModel: Model<IBoard>,
+    private readonly _boardConfigService: BoardConfigService
+  ) {
     super(boardModel);
   }
 
@@ -30,13 +33,50 @@ export class BoardService extends CrudService<IBoard> {
     return doc;
   }
 
+  public async addStoryToBoard(
+    storyId: string,
+    columnId: string,
+    boardId: string,
+    userId: string
+  ): Promise<IBoard> {
+    const board: IBoard = await this._findOne({ _id: boardId }, userId);
+
+    const column: any = board.columns.find((col: any) => {
+      console.log(col._id, columnId);
+      return col._id.toString() === columnId;
+    });
+
+    column.stories.push(storyId);
+
+    this._save(board);
+
+    return;
+  }
+
   public async createBoard(body: Partial<IBoard>, userId: string): Promise<IBoard> {
     const board = this._create(body, userId);
     const savedBoard = await this._save(board);
-    await this._boardConfigService.create({ board: savedBoard._id, ...defaultConfigValues }, userId);
+    await this._boardConfigService.create(
+      { board: savedBoard._id, ...defaultConfigValues },
+      userId
+    );
 
     return savedBoard;
   }
 
-  // TODO - add a function for the logic for adding the story to the board is moved to the API instead of the UI
+  public async updateBoard(
+    body: Partial<IBoard>,
+    userId: string,
+    params: IParams
+  ): Promise<IBoard> {
+    const document = await this._findOne(params, userId);
+    if (!document) {
+      throw new NotFoundException('The item you are trying to edit cannot be found!');
+    }
+
+    Object.assign(document, body);
+    await this._save(document);
+
+    return await this.findOne(params, userId);
+  }
 }
