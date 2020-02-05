@@ -4,7 +4,7 @@ import { IDocumentNames } from '../../../config/interfaces/document-names.interf
 import { Get, Req, Param, HttpCode, Delete } from '@nestjs/common';
 import { IReq } from '../../../config/interfaces/middleware-params.interface';
 import { ICollectionPromise } from 'src/config/interfaces/http/collection-response.interface';
-import { IModelPromise } from 'src/config/interfaces/http/model-response.interface';
+import { IModelPromiseDeprecated } from 'src/config/interfaces/http/model-response-deprecated.interface';
 
 export class BaseController<D extends Document, S extends CrudService<D>> {
   protected readonly _nativeService: S;
@@ -36,7 +36,10 @@ export class BaseController<D extends Document, S extends CrudService<D>> {
   }
 
   @Get(`/:${this._nativeId}`)
-  public async findOne(@Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromise<D> {
+  public async findOne(
+    @Param(`${this._nativeId}`) _id: string,
+    @Req() req: IReq
+  ): IModelPromiseDeprecated<D> {
     const doc = await this._nativeService.findOne({ _id }, req.user._id).catch(e => {
       throw e;
     });
