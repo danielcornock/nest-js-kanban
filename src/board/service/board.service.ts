@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CrudService } from '../../shared/abstracts/crud-service/crud-service.abstract';
-import { IBoard } from '../model/board';
+import { IBoard, IColumn } from '../model/board';
 import { MongooseModel } from '../../shared/database/mongoose/constants';
 import { Model } from 'mongoose';
 import { IParams } from '../../config/interfaces/params.interface';
@@ -41,19 +41,22 @@ export class BoardService extends CrudService<IBoard> {
   ): Promise<IBoard> {
     const board: IBoard = await this._findOne({ _id: boardId }, userId);
 
-    const column: any = board.columns.find((col: any) => {
-      console.log(col._id, columnId);
-      return col._id.toString() === columnId;
-    });
+    const column: any = this._findColumn(board, columnId);
 
     column.stories.push(storyId);
 
-    this._save(board);
+    await this._save(board);
 
     return;
   }
 
-  public async createBoard(body: Partial<IBoard>, userId: string): Promise<IBoard> {
+  private _findColumn(board: IBoard, columnId: string): IColumn {
+    return board.columns.find((col: any) => {
+      return col._id.toString() === columnId;
+    });
+  }
+
+  public async createBoard(body: IBoard, userId: string): Promise<IBoard> {
     const board = this._create(body, userId);
     const savedBoard = await this._save(board);
     await this._boardConfigService.create(
@@ -64,11 +67,7 @@ export class BoardService extends CrudService<IBoard> {
     return savedBoard;
   }
 
-  public async updateBoard(
-    body: Partial<IBoard>,
-    userId: string,
-    params: IParams
-  ): Promise<IBoard> {
+  public async updateBoard(body: IBoard, userId: string, params: IParams): Promise<IBoard> {
     const document = await this._findOne(params, userId);
     if (!document) {
       throw new NotFoundException('The item you are trying to edit cannot be found!');

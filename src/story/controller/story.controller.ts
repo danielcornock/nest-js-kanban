@@ -16,7 +16,6 @@ import { StoryDTO } from '../data/story.dto';
 import { IReq } from '../../config/interfaces/middleware-params.interface';
 import { BaseController } from '../../shared/abstracts/base-controller.abstract.ts/base-controller.abstract';
 import { IStory } from '../model/story';
-import { IModelPromiseDeprecated } from '../../config/interfaces/http/model-response-deprecated.interface';
 import { IModelPromise } from '../../config/interfaces/http/model-response.interface';
 import { BoardService } from '../../board/service/board.service';
 import { storyDocumentNames } from '../providers/story.providers';

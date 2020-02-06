@@ -15,13 +15,20 @@ export class StoryService extends CrudService<IStory> {
     this._boardService = boardService;
   }
 
-  public async createStory(body: Partial<IStory>, boardId: string, userId: string): Promise<IStory> {
+  public async createStory(
+    body: Partial<IStory>,
+    boardId: string,
+    userId: string
+  ): Promise<IStory> {
     const story: IStory = this._create(body, userId);
     const board = await this._boardService.fetchBoardStoryNumber({ _id: boardId }, userId);
 
     this._bumpStoryNumber(board, story);
 
-    const [updatedStory] = await Promise.all([this._save(story), this._boardService.update(board, userId, { _id: boardId })]);
+    const [updatedStory] = await Promise.all([
+      this._save(story),
+      this._boardService.update(board, userId, { _id: boardId })
+    ]);
 
     return updatedStory;
   }

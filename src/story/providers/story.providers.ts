@@ -12,3 +12,11 @@ export const storyProviders = [
 ];
 
 export const storyDocumentNames = { singular: 'story', plural: 'stories' };
+
+export const createFullStoryLink = (
+  boardId: string,
+  columnId: string,
+  storyId?: string
+): string => {
+  return `boards/${boardId}/columns/${columnId}/stories/${storyId ? storyId : ''}`;
+};

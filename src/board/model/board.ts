@@ -37,6 +37,11 @@ export interface IBoard extends Document {
   title: string;
   storyNumAccum?: number;
   user: string;
-  columns: Array<string>;
+  columns: Array<IColumn>;
   config: string;
+}
+
+export interface IColumn extends Document {
+  title: string;
+  stories: Array<string>;
 }
