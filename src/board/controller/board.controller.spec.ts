@@ -5,9 +5,15 @@ import { BoardServiceStub } from '../service/board.service.stub';
 import { AuthModule } from '../../auth/auth.module';
 import { IBoard } from '../model/board';
 import { reqUserMock } from '../../testing/req-user.mock';
+import { ModelInstance } from '../../shared/http/model-instance';
+import { ModelInstanceStub } from '../../shared/http/model-instance.stub';
+import { boardDocumentNames } from '../providers/board.providers';
 
 describe('Board Controller', () => {
-  let controller: BoardController, service: BoardService, result: any;
+  let controller: BoardController,
+    service: BoardService,
+    result: any,
+    modelInstance: ModelInstanceStub;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,6 +22,10 @@ describe('Board Controller', () => {
       providers: [{ provide: BoardService, useClass: BoardServiceStub }]
     }).compile();
 
+    modelInstance = new ModelInstanceStub();
+
+    jest.spyOn(ModelInstance, 'create').mockReturnValue(modelInstance);
+
     service = module.get<BoardService>(BoardService);
     controller = module.get<BoardController>(BoardController);
   });
@@ -23,25 +33,31 @@ describe('Board Controller', () => {
   describe('when updating a board', () => {
     describe('when a board is successfully updated', () => {
       beforeEach(async () => {
-        (service.update as jest.Mock).mockResolvedValue('updatedBoard');
+        (service.updateBoard as jest.Mock).mockResolvedValue('updatedBoard');
         result = await controller.update({ title: 'test' } as IBoard, 'boardId', reqUserMock);
       });
 
       it('should call the board service to update the board', () => {
-        expect(service.update).toHaveBeenCalledWith({ title: 'test' }, 'userId', {
+        expect(service.updateBoard).toHaveBeenCalledWith({ title: 'test' }, 'userId', {
           _id: 'boardId'
         });
       });
 
+      it('should create the model instance', () => {
+        expect(ModelInstance.create).toHaveBeenCalledWith('updatedBoard', boardDocumentNames);
+      });
+
       it('should return the updated board', () => {
-        expect(result).toEqual({ board: 'updatedBoard' });
+        expect(result).toBe(modelInstance);
       });
     });
 
     describe('when something goes wrong', () => {
       beforeEach(async () => {
-        (service.update as jest.Mock).mockRejectedValue('rejectedUpdate');
-        controller.update({ title: 'test' } as IBoard, 'boardId', reqUserMock).catch(e => (result = e));
+        (service.updateBoard as jest.Mock).mockRejectedValue('rejectedUpdate');
+        controller
+          .update({ title: 'test' } as IBoard, 'boardId', reqUserMock)
+          .catch(e => (result = e));
       });
 
       it('should return the error', () => {
