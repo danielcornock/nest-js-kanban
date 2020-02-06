@@ -9,7 +9,7 @@ describe('ModelInstance', () => {
     names = { singular: 'singular', plural: 'plural' };
     data = { _id: '_id' };
     jest.spyOn(LinkBuilder, 'self').mockReturnValue('link/self');
-    model = new ModelInstance(data, names);
+    model = ModelInstance.create(data, names);
   });
 
   it('should create a model instance', () => {

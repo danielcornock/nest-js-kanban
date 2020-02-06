@@ -7,15 +7,19 @@ export class ModelInstance<T extends Document> {
   public data: IModelData<T> = {};
   public meta: IModelMeta;
 
-  static create<D extends Document>(dataObject: D, names: IDocumentNames) {
-    return new ModelInstance<D>(dataObject, names);
+  static create<D extends Document>(
+    dataObject: D,
+    names: IDocumentNames,
+    selfLinkOverride?: string
+  ) {
+    return new ModelInstance<D>(dataObject, names, selfLinkOverride);
   }
 
-  constructor(dataObject: T, names: IDocumentNames) {
+  constructor(dataObject: T, names: IDocumentNames, selfLinkOverride) {
     this.data[names.singular] = dataObject;
     this.meta = {
       links: {
-        self: LinkBuilder.self(names.plural, dataObject._id)
+        self: selfLinkOverride ? selfLinkOverride : LinkBuilder.self(names.plural, dataObject._id)
       }
     };
   }
