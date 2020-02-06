@@ -20,6 +20,7 @@ import { IModelPromiseDeprecated } from '../../config/interfaces/http/model-resp
 import { IModelPromise } from '../../config/interfaces/http/model-response.interface';
 import { ModelInstance } from '../../shared/http/model-instance';
 import { boardDocumentNames } from '../providers/board.providers';
+import { ICollectionPromise } from 'src/config/interfaces/http/collection-response.interface';
 
 @Controller()
 @UseGuards(AuthGuard)
@@ -31,11 +32,20 @@ export class BoardController extends BaseController<IBoard, BoardService> {
   @Post('/')
   @UsePipes(ValidationPipe)
   public async create(@Body() body: BoardDTO, @Req() req: IReq): IModelPromiseDeprecated<IBoard> {
-    const board = await this._nativeService.createBoard(body, req.user._id).catch(e => {
+    const board = await this._nativeService.createBoard(body as IBoard, req.user._id).catch(e => {
       throw e;
     });
 
     return { board };
+  }
+
+  @Get('/list')
+  public async list(@Req() req: IReq): ICollectionPromise<Partial<IBoard>> {
+    const documentList = await this._nativeService.list(req.user._id).catch(e => {
+      throw e;
+    });
+
+    return { [this._names.plural]: documentList };
   }
 
   @Put(`/:${this._nativeId}`)
@@ -45,9 +55,11 @@ export class BoardController extends BaseController<IBoard, BoardService> {
     @Param(`${this._nativeId}`) _id: string,
     @Req() req: IReq
   ): IModelPromise<IBoard> {
-    const doc = await this._nativeService.updateBoard(body, req.user._id, { _id }).catch(e => {
-      throw e;
-    });
+    const doc = await this._nativeService
+      .updateBoard(body as IBoard, req.user._id, { _id })
+      .catch(e => {
+        throw e;
+      });
 
     return ModelInstance.create(doc, this._names);
   }
