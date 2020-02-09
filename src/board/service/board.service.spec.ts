@@ -147,7 +147,9 @@ describe('BoardService', () => {
         });
         (dependencies.repo.save as jest.Mock).mockResolvedValue('saved-board');
         jest.spyOn(service, 'findOne').mockResolvedValue({} as IBoard);
-        result = await service.updateBoard({ _id: 'new-id' }, 'user-id', { _id: 'search-id' });
+        result = await service.updateBoard({ _id: 'new-id' } as IBoard, 'user-id', {
+          _id: 'search-id'
+        });
       });
 
       it('should fetch the board', () => {
@@ -176,9 +178,11 @@ describe('BoardService', () => {
     describe('when something goes wrong', () => {
       beforeEach(() => {
         (dependencies.repo.findOne as jest.Mock).mockRejectedValue('err');
-        service.updateBoard({ _id: 'new-id' }, 'user-id', { _id: 'search-id' }).catch(err => {
-          result = err;
-        });
+        service
+          .updateBoard({ _id: 'new-id' } as IBoard, 'user-id', { _id: 'search-id' })
+          .catch(err => {
+            result = err;
+          });
       });
 
       it('should return the error', () => {
