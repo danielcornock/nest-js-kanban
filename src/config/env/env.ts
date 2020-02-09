@@ -7,7 +7,11 @@ export const environment: string = process.env.NODE_ENV;
 const dbPassword = encodeURIComponent(process.env.DB_PASSWORD);
 
 export const database = (env: string): string => {
-  return process.env.DB_LOCAL_URI;
+  if (environment == 'production') {
+    return process.env.DB_URI;
+  } else {
+    return process.env.DB_LOCAL_URI;
+  }
 };
 
 export const jwtSecret: string = process.env.JWT_SECRET;
