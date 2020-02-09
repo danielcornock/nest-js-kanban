@@ -6,7 +6,7 @@ export const environment: string = process.env.NODE_ENV;
 
 const dbPassword = encodeURIComponent(process.env.DB_PASSWORD);
 
-export const database = (env: string): string => {
+export const database = (): string => {
   if (environment == 'production') {
     return process.env.DB_URI;
   } else {
