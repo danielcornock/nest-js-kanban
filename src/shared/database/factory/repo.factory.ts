@@ -16,7 +16,7 @@ export class RepoFactory<D extends Document> {
     return new model(data);
   }
 
-  public findMany(query: IParams): DocumentQuery<D[], D, {}> {
+  public findMany(query: IParams): DocumentQuery<Array<D>, D, {}> {
     return this._model.find(query);
   }
 

@@ -1,15 +1,20 @@
 import { AuthGuard } from './auth.guard';
 import { AuthService } from '../service/auth.service';
 import { AuthServiceMock } from '../service/auth.service.stub';
-import { ExecutionContext, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { ExecutionContext } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { jwtSecret } from '../../config/env/env';
-import * as util from '../../config/utilties/utilities';
 import * as promFn from '../../config/utilties/promisifiedFn';
 import { promisifySpy } from '../../config/utilties/utilities.test';
 
 describe('AuthGuard', () => {
-  let guard: AuthGuard, authService: AuthService, context: ExecutionContext, http: Partial<HttpArgumentsHost>, validRequest: any, invalidRequest: any, fetchUserSpy;
+  let guard: AuthGuard,
+    authService: AuthService,
+    context: ExecutionContext,
+    http: Partial<HttpArgumentsHost>,
+    validRequest: any,
+    invalidRequest: any,
+    fetchUserSpy;
 
   beforeEach(() => {
     authService = (new AuthServiceMock() as unknown) as AuthService;
@@ -47,7 +52,7 @@ describe('AuthGuard', () => {
 
       describe('when the jwt can be verified', () => {
         beforeEach(() => {
-          //* Promisify is used for JWT-Compare
+          // * Promisify is used for JWT-Compare
           promisifySpy.mockResolvedValue({ id: '0000' });
         });
 

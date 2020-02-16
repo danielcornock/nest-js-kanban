@@ -9,12 +9,16 @@ import { IModelPromiseDeprecated } from '../../config/interfaces/http/model-resp
 @Controller()
 @UseGuards(AuthGuard)
 export class BoardConfigController extends BaseController<IBoardConfig, BoardConfigService> {
-  constructor(BoardConfigService: BoardConfigService) {
-    super(BoardConfigService, { plural: 'boardConfig', singular: 'boardConfig' });
+  constructor(boardConfigService: BoardConfigService) {
+    super(boardConfigService, { plural: 'boardConfig', singular: 'boardConfig' });
   }
 
   @Put(`/:${this._nativeId}`)
-  public async update(@Body() body: IBoardConfig, @Param(`${this._nativeId}`) _id: string, @Req() req: IReq): IModelPromiseDeprecated<IBoardConfig> {
+  public async update(
+    @Body() body: IBoardConfig,
+    @Param(`${this._nativeId}`) _id: string,
+    @Req() req: IReq
+  ): IModelPromiseDeprecated<IBoardConfig> {
     const config = await this._nativeService.update(body, req.user._id, { _id }).catch(e => {
       throw e;
     });

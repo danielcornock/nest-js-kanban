@@ -1,6 +1,6 @@
 import { RepoFactory } from './repo.factory';
 import { MongooseModelMock } from '../../../testing/mongoose-model.mock';
-import { Model, Document, Mongoose } from 'mongoose';
+import { Model, Document } from 'mongoose';
 
 describe('RepoFactory', () => {
   let factory: RepoFactory<Document>, model: Model<Document>, result: string;
@@ -26,10 +26,11 @@ describe('RepoFactory', () => {
   });
 
   describe('when creating a database entity', () => {
-    let modelToCreate: any;
-
     beforeEach(() => {
-      result = factory.createEntity((MongooseModelMock as unknown) as Model<Document>, {} as Document) as any;
+      result = factory.createEntity(
+        (MongooseModelMock as unknown) as Model<Document>,
+        {} as Document
+      ) as any;
     });
 
     it('should create a new entity', () => {
@@ -53,7 +54,7 @@ describe('RepoFactory', () => {
   });
 
   describe('when saving an item to the database', () => {
-    let modelToSave: MongooseModelMock, result: string;
+    let modelToSave: MongooseModelMock;
 
     beforeEach(() => {
       modelToSave = new MongooseModelMock();

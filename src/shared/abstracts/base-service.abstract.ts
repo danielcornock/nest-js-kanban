@@ -23,7 +23,7 @@ export abstract class BaseService<IDoc extends Document> {
     return this._repo.findOne(this._attachUserToParams(query, userId));
   }
 
-  protected _findMany(userId: string, params?: IParams): DocumentQuery<IDoc[], IDoc, {}> {
+  protected _findMany(userId: string, params?: IParams): DocumentQuery<Array<IDoc>, IDoc, {}> {
     return this._repo.findMany(this._attachUserToParams(params, userId));
   }
 

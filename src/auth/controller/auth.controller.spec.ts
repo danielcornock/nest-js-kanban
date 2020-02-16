@@ -1,21 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from '../service/auth.service';
 import { AuthServiceMock } from '../service/auth.service.stub';
 import { IUser } from '../model/user';
 import { IAuthInstance } from '../data/auth-res.interface';
+import { StubCreator } from '../../testing/stub-creator.service';
 
 describe('Auth Controller', () => {
   let controller: AuthController, service: AuthService, mockUserRes: IUser;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [{ provide: AuthService, useClass: AuthServiceMock }]
-    }).compile();
-
-    controller = module.get<AuthController>(AuthController);
-    service = module.get<AuthService>(AuthService);
+    service = StubCreator.create(AuthServiceMock);
+    controller = new AuthController(service);
   });
 
   beforeEach(() => {

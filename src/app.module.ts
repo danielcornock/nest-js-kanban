@@ -17,6 +17,4 @@ import { BoardConfigModule } from './board-config/board-config.module';
     BoardConfigModule
   ]
 })
-export class AppModule {
-  constructor() {}
-}
+export class AppModule {}
