@@ -5,16 +5,14 @@ import { RepoFactory } from '../../database/factory/repo.factory';
 import * as exceptions from '@nestjs/common';
 import { RepoFactoryStub } from '../../../shared/database/factory/repo.factory.stub';
 import { MongooseQueryMock } from '../../../testing/mongoose-query.mock';
-
-const model = new MongooseModelMock();
+import { StubCreator } from '../../../testing/stub-creator.service';
 
 describe('CrudService', () => {
   let service: TestCrudService, model: Model<Document>, repo: RepoFactory<Document>, result: any;
 
   beforeEach(() => {
-    model = (new MongooseModelMock() as Partial<Model<Document>>) as Model<Document>;
-
-    repo = (new RepoFactoryStub() as Partial<RepoFactory<Document>>) as RepoFactory<Document>;
+    model = StubCreator.create(MongooseModelMock);
+    repo = StubCreator.create(RepoFactoryStub);
 
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 
@@ -131,7 +129,9 @@ describe('CrudService', () => {
           user: 'userId'
         });
 
-        result = await service.update(({ name: 'newDocName' } as unknown) as Document, 'userId', { _id: 'docId' });
+        result = await service.update(({ name: 'newDocName' } as unknown) as Document, 'userId', {
+          _id: 'docId'
+        });
       });
 
       it('should request the document from the database', () => {
@@ -171,7 +171,6 @@ describe('CrudService', () => {
     });
 
     describe('when a document is not deleted', () => {
-      let fn;
       beforeEach(async () => {
         (repo.delete as jest.Mock).mockResolvedValue({ deletedCount: 0 });
         service.delete({ _id: 'userId' }, 'userId').catch(err => {

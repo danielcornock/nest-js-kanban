@@ -47,7 +47,7 @@ export class AuthService extends BaseService<IUser> {
     const isMatch: boolean = await compare(loginPassword, storedPassword);
 
     if (!isMatch) {
-      throw new UnauthorizedException("Oops! That's the wrong password");
+      throw new UnauthorizedException(`Oops! That's the wrong password`);
     }
   }
 

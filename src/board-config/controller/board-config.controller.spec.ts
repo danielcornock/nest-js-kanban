@@ -1,8 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BoardConfigController } from './board-config.controller';
 import { BoardConfigServiceStub } from '../services/board-config.service.stub';
 import { BoardConfigService } from '../services/board-config.service';
-import { AuthModule } from '../../auth/auth.module';
 import { IBoardConfig } from '../model/board-config';
 import { reqUserMock } from '../../testing/req-user.mock';
 import { StubCreator } from '../../testing/stub-creator.service';

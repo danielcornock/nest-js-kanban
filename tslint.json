@@ -8,11 +8,14 @@
     "quotemark": [true, "single"],
     "member-access": [false],
     "ordered-imports": [false],
-    "max-line-length": "false",
+    "max-line-length": false,
     "member-ordering": [false],
     "interface-name": [false],
+    "curly": [true, "ignore-same-line"],
     "arrow-parens": false,
     "object-literal-sort-keys": false,
+    "no-unused-variable": true,
+    "array-type": [true, "generic"],
     "trailing-comma": [
       true,
       {
@@ -28,7 +31,8 @@
     "variable-name": {
       "options": ["check-format", "allow-leading-underscore"]
     },
-    "one-variable-per-declaration": false
+    "one-variable-per-declaration": false,
+    "max-classes-per-file": [true, 5]
   },
   "rulesDirectory": []
 }

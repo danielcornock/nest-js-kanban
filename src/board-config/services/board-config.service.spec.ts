@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BoardConfigService } from './board-config.service';
 import { IBoardConfig } from '../model/board-config';
 import { Model } from 'mongoose';
@@ -18,7 +17,9 @@ describe('BoardConfigService', () => {
       mongooseModel: (new MongooseModelMock() as unknown) as Model<IBoardConfig>
     };
 
-    repo = (new RepoFactoryStub() as Partial<RepoFactory<IBoardConfig>>) as RepoFactory<IBoardConfig>;
+    repo = (new RepoFactoryStub() as Partial<RepoFactory<IBoardConfig>>) as RepoFactory<
+      IBoardConfig
+    >;
 
     jest.spyOn(RepoFactory, 'create').mockReturnValue(repo);
 

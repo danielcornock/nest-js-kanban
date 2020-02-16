@@ -1,1 +1,1 @@
-export const promisifiedFn: (...args: any[]) => Promise<unknown> = jest.fn();
+export const promisifiedFn: (...args: Array<any>) => Promise<unknown> = jest.fn();

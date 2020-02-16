@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ForbiddenException } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
@@ -20,7 +20,11 @@ describe('AppController (e2e)', () => {
 
     expect(res.status).toBe(403);
     expect(res.unauthorized);
-    expect(res.body).toEqual({ error: 'Forbidden', message: 'Forbidden resource', statusCode: 403 });
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'Forbidden resource',
+      statusCode: 403
+    });
   });
 
   afterAll(async () => {
