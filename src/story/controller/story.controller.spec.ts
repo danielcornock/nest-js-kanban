@@ -10,35 +10,23 @@ import { BoardServiceStub } from '../../board/service/board.service.stub';
 import { ModelInstance } from '../../shared/http/model-instance';
 import { ModelInstanceStub } from '../../shared/http/model-instance.stub';
 import { storyDocumentNames } from '../providers/story.providers';
+import { StubCreator } from '../../testing/stub-creator.service';
 
 describe('Story Controller', () => {
   let controller: StoryController,
-    storyService: StoryServiceStub,
-    boardService: BoardServiceStub,
+    storyService: StoryService,
+    boardService: BoardService,
     result: any,
     modelInstanceStub: ModelInstanceStub;
 
-  beforeEach(async done => {
-    boardService = new BoardServiceStub();
-    storyService = new StoryServiceStub();
-
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
-      controllers: [StoryController],
-      providers: [
-        { provide: StoryService, useValue: storyService },
-        { provide: BoardService, useValue: boardService }
-      ]
-    }).compile();
-
-    console.log(module);
+  beforeEach(() => {
+    boardService = StubCreator.create(BoardServiceStub);
+    storyService = StubCreator.create(StoryServiceStub);
 
     modelInstanceStub = new ModelInstanceStub();
     jest.spyOn(ModelInstance, 'create').mockReturnValue(modelInstanceStub);
 
-    controller = module.get<StoryController>(StoryController);
-
-    done();
+    controller = new StoryController(storyService, boardService);
   });
 
   describe('when updating a story', () => {
@@ -128,7 +116,7 @@ describe('Story Controller', () => {
         );
       });
 
-      it('should call the story storyService to create the story', () => {
+      it('should call the story service to create the story', () => {
         expect(storyService.createStory).toHaveBeenCalledWith(
           { title: 'test' },
           'board-id',

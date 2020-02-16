@@ -5,25 +5,20 @@ import { BoardConfigService } from '../services/board-config.service';
 import { AuthModule } from '../../auth/auth.module';
 import { IBoardConfig } from '../model/board-config';
 import { reqUserMock } from '../../testing/req-user.mock';
+import { StubCreator } from '../../testing/stub-creator.service';
 
 describe('boardConfig Controller', () => {
   let controller: BoardConfigController,
     dependencies: {
-      boardConfigService: BoardConfigServiceStub;
+      boardConfigService: BoardConfigService;
     };
 
   beforeEach(async () => {
     dependencies = {
-      boardConfigService: new BoardConfigServiceStub()
+      boardConfigService: StubCreator.create(BoardConfigServiceStub)
     };
 
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
-      controllers: [BoardConfigController],
-      providers: [{ provide: BoardConfigService, useValue: dependencies.boardConfigService }]
-    }).compile();
-
-    controller = module.get<BoardConfigController>(BoardConfigController);
+    controller = new BoardConfigController(dependencies.boardConfigService);
   });
 
   describe('when updating the config', () => {
@@ -37,7 +32,11 @@ describe('boardConfig Controller', () => {
       });
 
       it('should update the config', () => {
-        expect(dependencies.boardConfigService.update).toHaveBeenCalledWith({ tags: [] }, 'userId', { _id: 'board-config-id' });
+        expect(dependencies.boardConfigService.update).toHaveBeenCalledWith(
+          { tags: [] },
+          'userId',
+          { _id: 'board-config-id' }
+        );
       });
 
       it('should return the result', async () => {
@@ -49,7 +48,9 @@ describe('boardConfig Controller', () => {
       beforeEach(() => {
         (dependencies.boardConfigService.update as jest.Mock).mockRejectedValue('err');
 
-        controller.update({ tags: [] } as IBoardConfig, 'board-config-id', reqUserMock).catch(e => (result = e));
+        controller
+          .update({ tags: [] } as IBoardConfig, 'board-config-id', reqUserMock)
+          .catch(e => (result = e));
       });
 
       it('should throw an error', async () => {

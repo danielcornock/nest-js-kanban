@@ -8,6 +8,7 @@ import { reqUserMock } from '../../testing/req-user.mock';
 import { ModelInstance } from '../../shared/http/model-instance';
 import { ModelInstanceStub } from '../../shared/http/model-instance.stub';
 import { boardDocumentNames } from '../providers/board.providers';
+import { StubCreator } from '../../testing/stub-creator.service';
 
 describe('Board Controller', () => {
   let controller: BoardController,
@@ -16,18 +17,12 @@ describe('Board Controller', () => {
     modelInstance: ModelInstanceStub;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
-      controllers: [BoardController],
-      providers: [{ provide: BoardService, useClass: BoardServiceStub }]
-    }).compile();
-
     modelInstance = new ModelInstanceStub();
 
     jest.spyOn(ModelInstance, 'create').mockReturnValue(modelInstance);
 
-    service = module.get<BoardService>(BoardService);
-    controller = module.get<BoardController>(BoardController);
+    service = StubCreator.create(BoardServiceStub);
+    controller = new BoardController(service);
   });
 
   describe('when updating a board', () => {
