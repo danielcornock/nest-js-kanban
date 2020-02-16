@@ -18,7 +18,7 @@ describe('Story Controller', () => {
     result: any,
     modelInstanceStub: ModelInstanceStub;
 
-  beforeEach(async () => {
+  beforeEach(async done => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule],
       controllers: [StoryController],
@@ -28,12 +28,16 @@ describe('Story Controller', () => {
       ]
     }).compile();
 
+    console.log(module);
+
     modelInstanceStub = new ModelInstanceStub();
     jest.spyOn(ModelInstance, 'create').mockReturnValue(modelInstanceStub);
 
     controller = module.get<StoryController>(StoryController);
     service = module.get<StoryService>(StoryService);
     boardService = module.get<BoardService>(BoardService);
+
+    done();
   });
 
   describe('when updating a story', () => {
