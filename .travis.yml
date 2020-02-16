@@ -1,10 +1,5 @@
 language: node_js
 node_js:
-  - '13.5.0'
-install:
-  - npm ci
-cache:
-  directories:
-    - '$HOME/.npm'
+  - '12.14.1'
 script:
   - npm test
