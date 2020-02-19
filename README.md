@@ -1,4 +1,6 @@
-<img align="center" src="./static/kanbo-api-branding.png">
+<p align="center">
+    <img src="./static/kanbo-api-branding.png">
+</p>
 
 <p align="center">
     <a href="https://travis-ci.com/danielcornock/kanbo-api" alt="Build status">
