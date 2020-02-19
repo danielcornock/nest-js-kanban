@@ -11,16 +11,25 @@
     </a>
 </p>
 
-The backend for a simple kanban board application inspired by Trello. Features include:
-
-- Linking github commits.
-- Tracked story numbers.
-- Custom tags & labels.
-- Drag and drop stories.
-
 > This project is a WIP.
 
-## Technologies used
+REST API for a kanban board application inspired by Trello. View the code for the front-end [here](https://github.com/danielcornock/kanbo-ui).
+
+Features include organised columns with drag & drop functionality, linking github commits, tracked story numbers & custom tags & labels.
+
+##### Board view
+
+<img src="./static/board-screenshot.png">
+
+##### Edit story modal
+
+<img src="./static/edit-story-screenshot.png">
+
+##### Github config modal
+
+<img src="./static/github-screenshot.png">
+
+#### Technologies used
 
 - NestJS
 - TypeScript
