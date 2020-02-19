@@ -1,9 +1,27 @@
-# NestJS Kanban API
+<img align="center" src="./static/kanbo-api-branding.png">
 
-![](https://travis-ci.com/danielcornock/nest-js-kanban.svg?branch=master)
+<p align="center">
+    <a href="https://travis-ci.com/danielcornock/kanbo-api" alt="Build status">
+        <img src="https://travis-ci.com/danielcornock/kanbo-api.svg?branch=master" />
+    </a>
+    <a href="https://coveralls.io/github/danielcornock/kanbo-api?branch=master" alt="Code coverage">
+        <img src="https://coveralls.io/repos/github/danielcornock/kanbo-api/badge.svg" />
+    </a>
+</p>
 
-[![Coverage Status](https://coveralls.io/repos/github/danielcornock/kanbo-api/badge.svg)](https://coveralls.io/github/danielcornock/kanbo-api?branch=master)
+The backend for a simple kanban board application inspired by Trello. Features include:
 
-[![Coverage Status](https://coveralls.io/repos/github/danielcornock/kanbo-api/badge.svg?branch=master)](https://coveralls.io/github/danielcornock/kanbo-api?branch=master)
+- Linking github commits.
+- Tracked story numbers.
+- Custom tags & labels.
+- Drag and drop stories.
 
-API for a kanban project, using NestJS, Typescript, NodeJS and Jest testing framework.
+> This project is a WIP.
+
+## Technologies used
+
+- NestJS
+- TypeScript
+- NodeJS
+- Jest
+- Express
