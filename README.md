@@ -17,19 +17,19 @@ REST API for a kanban board application inspired by Trello. View the code for th
 
 Features include organised columns with drag & drop functionality, linking github commits, tracked story numbers & custom tags & labels.
 
-##### Board view
+#### Board view
 
 <img src="./static/board-screenshot.png">
 
-##### Edit story modal
+#### Edit story modal
 
 <img src="./static/edit-story-screenshot.png">
 
-##### Github config modal
+#### Github config modal
 
 <img src="./static/github-screenshot.png">
 
-#### Technologies used
+### Technologies used
 
 - NestJS
 - TypeScript
