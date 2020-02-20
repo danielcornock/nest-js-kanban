@@ -10,6 +10,7 @@
         <img src="https://coveralls.io/repos/github/danielcornock/kanbo-api/badge.svg" />
     </a>
       <img src="http://heroku-badge.herokuapp.com/?app=ng-kanban&style=flat&svg=1">
+      <img src="https://img.shields.io/badge/status-WIP-orange">
 </p>
 <p align="center">
 <code>NestJS</code>
