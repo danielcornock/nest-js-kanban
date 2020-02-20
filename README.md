@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./static/kanbo-api-branding.png" width="70%">
+    <img src="./static/kanbo-api-branding.png" width="50%">
 </p>
 
 <p align="center">
