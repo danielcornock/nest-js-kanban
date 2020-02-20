@@ -11,6 +11,14 @@
     </a>
       <img src="http://heroku-badge.herokuapp.com/?app=ng-kanban&style=flat&svg=1">
 </p>
+<p align="center">
+<code>NestJS</code>
+<code>TypeScript</code>
+<code>NodeJS</code>
+<code>Express</code>
+<code>Jest</code>
+<code>TravisCI</code>
+</p>
 
 > This project is a WIP.
 
@@ -29,11 +37,3 @@ Features include organised columns with drag & drop functionality, linking githu
 #### Github config modal
 
 <img src="./static/github-screenshot.png">
-
-### Technologies used
-
-- NestJS
-- TypeScript
-- NodeJS
-- Jest
-- Express
