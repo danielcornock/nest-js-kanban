@@ -9,6 +9,7 @@
     <a href="https://coveralls.io/github/danielcornock/kanbo-api?branch=master" alt="Code coverage">
         <img src="https://coveralls.io/repos/github/danielcornock/kanbo-api/badge.svg" />
     </a>
+      <img src="http://heroku-badge.herokuapp.com/?app=ng-kanban&style=flat&svg=1">
 </p>
 
 > This project is a WIP.
